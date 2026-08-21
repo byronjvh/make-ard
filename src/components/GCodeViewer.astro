@@ -1,0 +1,223 @@
+---
+
+---
+
+<div class="gcode-container">
+    <div class="upload-area">
+        <input id="gcode-file" type="file" accept=".gcode,.gc,.gco" />
+
+        <label for="gcode-file"> Seleccionar G-code </label>
+
+        <p id="file-name">Ningún archivo seleccionado</p>
+    </div>
+
+    <div class="preview-wrapper">
+        <canvas id="gcode-canvas"></canvas>
+    </div>
+
+    <div>
+        <label for="line-width"> Line width </label>
+
+        <input
+            type="range"
+            min="0.1"
+            step="0.1"
+            value="1"
+            max="4"
+            name="line-width"
+            id="line-width"
+        />
+
+        <p id="line-width-value">1</p>
+    </div>
+
+    <div>
+        <label for="extrusion-width"> Extrusion width </label>
+
+        <input
+            type="range"
+            min="0"
+            max="1"
+            value="0.5"
+            step="0.05"
+            name="extrusion-width"
+            id="extrusion-width"
+        />
+
+        <p id="extrusion-width-value">0.5</p>
+    </div>
+</div>
+
+<script>
+    import * as GCodePreview from "gcode-preview";
+    import { removePurgeLines } from "../logic/GCodeRemovePurgeLines";
+
+    // =========================================================
+    // ELEMENTOS
+    // =========================================================
+
+    const fileInput = document.querySelector<HTMLInputElement>("#gcode-file");
+
+    const canvas = document.querySelector<HTMLCanvasElement>("#gcode-canvas");
+
+    const fileNameElement = document.querySelector<HTMLElement>("#file-name");
+
+    const lineWidthSlider =
+        document.querySelector<HTMLInputElement>("#line-width");
+
+    const lineWidthValue =
+        document.querySelector<HTMLElement>("#line-width-value");
+
+    const extrusionWidthSlider =
+        document.querySelector<HTMLInputElement>("#extrusion-width");
+
+    const extrusionWidthValue = document.querySelector<HTMLElement>(
+        "#extrusion-width-value",
+    );
+
+    if (
+        !fileInput ||
+        !canvas ||
+        !fileNameElement ||
+        !lineWidthSlider ||
+        !lineWidthValue ||
+        !extrusionWidthSlider ||
+        !extrusionWidthValue
+    ) {
+        throw new Error("No se encontraron los elementos necesarios");
+    }
+
+    // =========================================================
+    // G-CODE
+    // =========================================================
+
+    let gcode = "";
+
+    // =========================================================
+    // CONFIGURACIÓN
+    // =========================================================
+
+    const backgroundColor = "#001828";
+
+    const extrusionColor = "#ffffff";
+
+    let lineWidth = Number(lineWidthSlider.value);
+
+    let extrusionWidth = Number(extrusionWidthSlider.value);
+
+    const renderTravel = false;
+
+    const renderExtrusion = true;
+
+    const renderTubes = true;
+
+    // =========================================================
+    // PREVIEW
+    // =========================================================
+
+    let options = {
+        canvas,
+
+        backgroundColor,
+        extrusionColor,
+
+        renderTravel,
+        renderExtrusion,
+        renderTubes,
+
+        lineWidth,
+        extrusionWidth,
+    };
+
+    let gcodePreview = GCodePreview.init(options);
+
+    // =========================================================
+    // LINE WIDTH
+    // =========================================================
+
+    lineWidthSlider.addEventListener("input", () => {
+        const value = Number(lineWidthSlider.value);
+
+        lineWidthValue.textContent = value.toString();
+
+        gcodePreview.lineWidth = value;
+        gcodePreview.render();
+    });
+
+    extrusionWidthSlider.addEventListener("input", () => {
+        const value = Number(extrusionWidthSlider.value);
+
+        extrusionWidthValue.textContent = value.toString();
+
+        gcodePreview.extrusionWidth = value;
+        gcodePreview.render();
+    });
+
+    // =========================================================
+    // CARGAR G-CODE
+    // =========================================================
+
+    fileInput.addEventListener("change", async (event) => {
+        const input = event.currentTarget as HTMLInputElement;
+
+        const file = input.files?.[0];
+
+        if (!file) return;
+
+        fileNameElement.textContent = file.name;
+
+        const originalGCode = await file.text();
+
+        const result = removePurgeLines(originalGCode);
+        console.table(result.candidates);
+
+        gcodePreview.processGCode(result.gcode);
+        gcodePreview.controls.enabled = false;
+    });
+</script>
+
+<style>
+    .gcode-container {
+        width: 100%;
+        max-width: 500px;
+        margin: auto;
+    }
+
+    .upload-area {
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .upload-area input[type="file"] {
+        display: none;
+    }
+
+    .upload-area label {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+
+        border-radius: 0.5rem;
+
+        background: #ffffff;
+        color: #001828;
+
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .preview-wrapper {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+
+        background: #001828;
+
+        overflow: hidden;
+    }
+
+    #gcode-canvas {
+        width: 100%;
+        height: 100%;
+
+        display: block;
+    }
+</style>

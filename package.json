@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.2.4"
+    "astro": "^7.2.4",
+    "gcode-preview": "^2.18.0"
   }
 }
