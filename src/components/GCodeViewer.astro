@@ -19,7 +19,14 @@
 <script>
     import { GCodePreview } from "gcode-preview";
     import { removePurgeLines } from "../logic/GCodeRemovePurgeLines";
-    import { setCameraView } from "../utils/camera";
+    import { setCameraView, type CameraAngle } from "../logic/camera";
+    import { modelCenter } from "../logic/modelCenter";
+    import { getGCodeBounds } from "../logic/getGCodeBounds";
+    import * as THREE from "three";
+
+    // =========================================================
+    // ELEMENTOS
+    // =========================================================
 
     const fileInput = document.querySelector<HTMLInputElement>("#gcode-file");
 
@@ -31,48 +38,12 @@
         throw new Error("No se encontraron los elementos necesarios");
     }
 
-    // Resolución real
+    // =========================================================
+    // RESOLUCIÓN REAL DEL CANVAS
+    // =========================================================
+
     canvas.width = 2000;
     canvas.height = 2000;
-
-    // =========================================================
-    // GCODE PREVIEW 3.0
-    // =========================================================
-
-    const preview = new GCodePreview({
-        canvas,
-
-        renderTravel: false,
-        renderExtrusion: true,
-        renderTubes: true,
-
-        lineWidth: 2,
-        extrusionWidth: 1,
-
-        backgroundColor: "#001828",
-        extrusionColor: "#1e90ff",
-
-        buildVolume: {
-            x: 300,
-            y: 300,
-            z: 300,
-            smallGrid: false,
-        },
-    });
-
-    const sceneManager = preview.sceneManager;
-
-    sceneManager.scene.traverse((object: any) => {
-        if (object.name === "BuildVolume") {
-            object.visible = false;
-        }
-    });
-
-    // =========================================================
-    // DESACTIVAR CONTROLES
-    // =========================================================
-
-    sceneManager.controls.enabled = false;
 
     // =========================================================
     // CARGAR G-CODE
@@ -91,12 +62,136 @@
 
         const result = removePurgeLines(originalGCode);
 
-        await preview.processGCode(result.gcode);
+        const gcode = result.gcode;
 
-        // IMPORTANTE:
-        // ahora la cámara se obtiene desde
-        // preview.sceneManager
-        setCameraView(preview, "isometric");
+        const bounds = getGCodeBounds(gcode);
+
+        if (!bounds) {
+            console.error("No se pudo calcular el volumen del G-code.");
+
+            return;
+        }
+
+        // =================================================
+        // PEQUEÑO MARGEN
+        // =================================================
+
+        const margin = 10;
+
+        const buildVolume = {
+            x: Math.max(bounds.sizeX + margin, 1),
+
+            y: Math.max(bounds.sizeY + margin, 1),
+
+            z: Math.max(bounds.sizeZ + margin, 1),
+            smallGrid: false,
+        };
+
+        // =================================================
+        // CREAR PREVIEW
+        // =================================================
+
+        const preview = new GCodePreview({
+            canvas,
+
+            buildVolume,
+
+            renderTravel: false,
+            renderExtrusion: true,
+            renderTubes: true,
+
+            lineWidth: 2,
+            lineHeight: 1,
+
+            backgroundColor: "#001828",
+
+            extrusionColor: "#1e90ff",
+        });
+
+        const buildVolumeFromScene =
+            preview.sceneManager.scene.getObjectByName("BuildVolume");
+
+        if (buildVolumeFromScene) {
+            buildVolumeFromScene.visible = false;
+        }
+
+        // =================================================
+        // PROCESAR
+        // =================================================
+
+        canvas.style.visibility = "hidden";
+
+        await preview.processGCode(gcode);
+
+        canvas.style.visibility = "visible";
+
+        const extrusions =
+            preview.sceneManager.scene.getObjectByName("Extrusions");
+
+        extrusions?.traverse((object: any) => {
+            if (!object.isMesh) return;
+
+            const material = object.material;
+
+            if (!material.isShaderMaterial) return;
+
+            material.fragmentShader = material.fragmentShader.replace(
+                "vec3 lightDir = normalize(vec3(-0.8, -0.2, -0.8));",
+                "vec3 lightDir = normalize(vec3(0,-0.3,-1));",
+            );
+            material.fragmentShader = material.fragmentShader.replace(
+                "float diff = max(dot(vNormal, -lightDir), 0.0) * directional;",
+                "float diff = max(dot(vNormal, -lightDir), 0.3) * directional;",
+            );
+
+            material.uniforms.ambient.value = 0.4;
+            material.uniforms.directional.value = 0.7;
+            material.uniforms.brightness.value = 1.2;
+
+            material.needsUpdate = true;
+        });
+
+        const scene = preview.sceneManager.scene;
+
+        modelCenter(scene, buildVolume);
+
+        const cameraButtons = [
+            "isometric",
+            "isometric2",
+            "front",
+            "back",
+            "left",
+            "right",
+            "top",
+        ] as const;
+
+        setCameraView(preview, cameraButtons[0]);
+
+        const cameraContainer = document.createElement("div");
+
+        cameraContainer.style.display = "flex";
+        cameraContainer.style.flexWrap = "wrap";
+        cameraContainer.style.gap = "5px";
+        cameraContainer.style.marginTop = "10px";
+
+        for (const angle of cameraButtons) {
+            const button = document.createElement("button");
+
+            button.textContent = angle;
+
+            button.style.cursor = "pointer";
+            button.style.padding = "6px 10px";
+
+            button.addEventListener("click", () => {
+                setCameraView(preview, angle as CameraAngle);
+            });
+
+            cameraContainer.appendChild(button);
+        }
+
+        document
+            .querySelector(".gcode-container")
+            ?.appendChild(cameraContainer);
     });
 </script>
 
