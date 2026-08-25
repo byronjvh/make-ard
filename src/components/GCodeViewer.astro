@@ -22,6 +22,7 @@
     import { setCameraView, type CameraAngle } from "../logic/camera";
     import { modelCenter } from "../logic/modelCenter";
     import { getGCodeBounds } from "../logic/getGCodeBounds";
+    import { makeExtrusionsRectangular } from "../logic/makeExtrusionsRectangular";
     import * as THREE from "three";
 
     // =========================================================
@@ -90,7 +91,7 @@
         // =================================================
         // CREAR PREVIEW
         // =================================================
-
+        let lineHeight = 0.4;
         const preview = new GCodePreview({
             canvas,
 
@@ -99,9 +100,10 @@
             renderTravel: false,
             renderExtrusion: true,
             renderTubes: true,
+            extrusionWidth: 0.8,
 
-            lineWidth: 2,
-            lineHeight: 1,
+            lineWidth: 0.4,
+            lineHeight,
 
             backgroundColor: "#001828",
 
@@ -125,7 +127,7 @@
 
         canvas.style.visibility = "visible";
 
-        const extrusions =
+        const extrusions: any =
             preview.sceneManager.scene.getObjectByName("Extrusions");
 
         extrusions?.traverse((object: any) => {
@@ -141,12 +143,12 @@
             );
             material.fragmentShader = material.fragmentShader.replace(
                 "float diff = max(dot(vNormal, -lightDir), 0.0) * directional;",
-                "float diff = max(dot(vNormal, -lightDir), 0.3) * directional;",
+                "float diff = max(dot(vNormal, -lightDir), 0.05) * directional;",
             );
 
-            material.uniforms.ambient.value = 0.4;
-            material.uniforms.directional.value = 0.7;
-            material.uniforms.brightness.value = 1.2;
+            material.uniforms.ambient.value = 0.45;
+            material.uniforms.directional.value = 1.1;
+            material.uniforms.brightness.value = 1.15;
 
             material.needsUpdate = true;
         });
@@ -154,6 +156,8 @@
         const scene = preview.sceneManager.scene;
 
         modelCenter(scene, buildVolume);
+
+        makeExtrusionsRectangular(preview.sceneManager.scene);
 
         const cameraButtons = [
             "isometric",
