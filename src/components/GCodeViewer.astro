@@ -24,6 +24,7 @@
     import { getGCodeBounds } from "../logic/getGCodeBounds";
     import { makeExtrusionsRectangular } from "../logic/makeExtrusionsRectangular";
     import * as THREE from "three";
+    import { extractPrintCardMetadata } from "../logic/extractPrintCardMetadata";
 
     // =========================================================
     // ELEMENTOS
@@ -64,6 +65,7 @@
         const result = removePurgeLines(originalGCode);
 
         const gcode = result.gcode;
+        console.log(extractPrintCardMetadata(gcode));
 
         const bounds = getGCodeBounds(gcode);
 
@@ -102,13 +104,27 @@
             renderTubes: true,
             extrusionWidth: 0.8,
 
-            lineWidth: 0.4,
+            lineWidth: 1,
             lineHeight,
 
             backgroundColor: "#001828",
 
             extrusionColor: "#1e90ff",
         });
+
+        const renderer = (preview.sceneManager as any).renderer;
+
+        if (renderer) {
+            console.log(
+                "MSAA máximo disponible:",
+                renderer.capabilities?.maxSamples,
+            );
+
+            console.log(
+                "Antialias activo:",
+                renderer.getContext?.().getContextAttributes?.().antialias,
+            );
+        }
 
         const buildVolumeFromScene =
             preview.sceneManager.scene.getObjectByName("BuildVolume");
@@ -143,12 +159,12 @@
             );
             material.fragmentShader = material.fragmentShader.replace(
                 "float diff = max(dot(vNormal, -lightDir), 0.0) * directional;",
-                "float diff = max(dot(vNormal, -lightDir), 0.05) * directional;",
+                "float diff = max(dot(vNormal, -lightDir), 0.35) * directional;",
             );
 
-            material.uniforms.ambient.value = 0.45;
-            material.uniforms.directional.value = 1.1;
-            material.uniforms.brightness.value = 1.15;
+            material.uniforms.ambient.value = 0.28;
+            material.uniforms.directional.value = 1.4;
+            material.uniforms.brightness.value = 1.0;
 
             material.needsUpdate = true;
         });

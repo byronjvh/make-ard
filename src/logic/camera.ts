@@ -14,7 +14,7 @@ const CAMERA_DIRECTIONS: Record<
     THREE.Vector3
 > = {
     isometric: new THREE.Vector3(1, 1, 1),
-    isometric2: new THREE.Vector3(-1, 1, -1),
+    isometric2: new THREE.Vector3(-1, 1, 1),
     front: new THREE.Vector3(0, 0, 1),
     back: new THREE.Vector3(0, 0, -1),
     left: new THREE.Vector3(-1, 0, 0),
@@ -114,7 +114,7 @@ export function setCameraView(
         Math.tan(fov / 2);
 
     // Un poco de margen
-    distance *= 1.25;
+    distance *= 1.1;
 
     // ==========================================
     // POSICIÓN

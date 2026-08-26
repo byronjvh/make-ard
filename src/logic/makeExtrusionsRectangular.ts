@@ -9,7 +9,7 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
         return;
     }
 
-    console.log("🔥 EXTRUSIONES → SECCIÓN REDONDEADA ACHATADA");
+    console.log("🔥 EXTRUSIONES → SECCIÓN CUADRADA");
 
     extrusions.traverse((obj) => {
 
@@ -35,20 +35,20 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
         // CONFIGURACIÓN
         // =====================================================
 
-        // Altura de la sección.
-        const halfHeight = 0.5;
+        /*
+         * Tamaño de la sección cuadrada.
+         *
+         * Si tu extrusionWidth es 1.2,
+         * empieza probando 1.2 aquí también.
+         *
+         * width = altura = cuadrado
+         */
+        const squareSize = 0.8;
 
-        // Qué tan achatadas serán las partes superior
-        // e inferior.
-        //
-        // 0.00 = esfera
-        // 0.15 = ligeramente achatada
-        // 0.25 = bastante achatada
-        //
-        const flatten = 0.15;
+        const halfSize = squareSize * 0.5;
 
         // =====================================================
-        // PROCESAR CADA GEOMETRÍA
+        // PROCESAR CADA EXTRUSIÓN
         // =====================================================
 
         for (
@@ -64,17 +64,14 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
             const start = info.vertexStart;
             const count = info.vertexCount;
 
-            if (count < 4) continue;
+            if (count <= 0) continue;
 
             // -------------------------------------------------
-            // CENTRO LOCAL
+            // ENCONTRAR CENTRO VERTICAL
             // -------------------------------------------------
 
-            let centerX = 0;
-            let centerY = 0;
-            let centerZ = 0;
-
-            let validVertices = 0;
+            let zMin = Infinity;
+            let zMax = -Infinity;
 
             for (
                 let i = start;
@@ -83,34 +80,40 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
             ) {
 
                 const p = i * 3;
-
-                const x = pos[p];
-                const y = pos[p + 1];
                 const z = pos[p + 2];
 
-                if (
-                    !Number.isFinite(x) ||
-                    !Number.isFinite(y) ||
-                    !Number.isFinite(z)
-                ) {
-                    continue;
-                }
+                if (!Number.isFinite(z)) continue;
 
-                centerX += x;
-                centerY += y;
-                centerZ += z;
-
-                validVertices++;
+                if (z < zMin) zMin = z;
+                if (z > zMax) zMax = z;
             }
 
-            if (validVertices === 0) continue;
+            if (
+                !Number.isFinite(zMin) ||
+                !Number.isFinite(zMax)
+            ) {
+                continue;
+            }
 
-            centerX /= validVertices;
-            centerY /= validVertices;
-            centerZ /= validVertices;
+            const centerZ = (zMin + zMax) * 0.5;
+
+            // =================================================
+            // CREAR DOS PLANOS EXACTOS
+            // =================================================
+
+            const bottomZ = centerZ - halfSize;
+            const topZ = centerZ + halfSize;
 
             // -------------------------------------------------
-            // TRANSFORMACIÓN
+            // NO TOCAMOS X
+            // NO TOCAMOS Y
+            //
+            // Únicamente convertimos la sección en:
+            //
+            //       ─────────  top
+            //       │        │
+            //       │        │
+            //       ─────────  bottom
             // -------------------------------------------------
 
             for (
@@ -121,61 +124,54 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
 
                 const p = i * 3;
 
-                const x = pos[p];
-                const y = pos[p + 1];
                 const z = pos[p + 2];
 
-                if (
-                    !Number.isFinite(x) ||
-                    !Number.isFinite(y) ||
-                    !Number.isFinite(z)
-                ) {
-                    continue;
-                }
+                if (!Number.isFinite(z)) continue;
 
-                // ---------------------------------------------
-                // Coordenada vertical normalizada
-                // ---------------------------------------------
+                const originalZ = z;
 
-                let nz =
-                    (z - centerZ) / halfHeight;
+                const normalized =
+                    (originalZ - zMin) / (zMax - zMin);
 
-                nz = THREE.MathUtils.clamp(nz, -1, 1);
-
-                // ---------------------------------------------
-                // Achatamiento de los extremos.
+                // Qué tanto conservamos la forma redondeada original.
                 //
-                // La zona central permanece redondeada.
-                // Los extremos se vuelven más planos.
-                // ---------------------------------------------
+                // 0.00 = cuadrado completamente plano
+                // 0.05 = redondeo muy ligero
+                // 0.10 = redondeo ligero
+                //
+                const roundness = 0.01;
 
-                const absZ = Math.abs(nz);
+                // Curva suave alrededor de los extremos
+                const smooth =
+                    normalized * normalized * (3 - 2 * normalized);
 
-                const flattenFactor =
-                    1 - flatten * Math.pow(absZ, 4);
+                // Mezclamos entre sección perfectamente cuadrada
+                // y una transición ligeramente redondeada.
+                const rounded =
+                    normalized * (1 - roundness) +
+                    smooth * roundness;
 
-                // ---------------------------------------------
-                // Aplicamos únicamente una modificación
-                // MUY ligera a la altura.
-                // ---------------------------------------------
-
-                const newZ =
-                    centerZ +
-                    nz *
-                    halfHeight *
-                    flattenFactor;
-
-                pos[p + 2] = newZ;
+                pos[p + 2] =
+                    bottomZ +
+                    rounded * (topZ - bottomZ);
             }
         }
 
         position.needsUpdate = true;
 
+        // =====================================================
+        // BOUNDS
+        // =====================================================
+
         geometry.computeBoundingBox();
         geometry.computeBoundingSphere();
+        geometry.computeVertexNormals()
+
+        if (geometry.attributes.normal) {
+            geometry.attributes.normal.needsUpdate = true;
+        }
+
     });
 
-    console.log(
-        "✅ Sección redondeada con extremos achatados"
-    );
+    console.log("✅ Sección cuadrada aplicada");
 }
