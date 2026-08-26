@@ -9,6 +9,8 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
         return;
     }
 
+    console.log("🔥 EXTRUSIONES → SECCIÓN REDONDEADA ACHATADA");
+
     extrusions.traverse((obj) => {
 
         if (!(obj as any).isBatchedMesh) return;
@@ -22,81 +24,158 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
 
         const pos = position.array as Float32Array;
 
+        const geometryInfo = (batched as any)._geometryInfo;
+
+        if (!geometryInfo) {
+            console.warn("❌ _geometryInfo no encontrado");
+            return;
+        }
+
         // =====================================================
         // CONFIGURACIÓN
         // =====================================================
 
-        const zStep = 0.5;
+        // Altura de la sección.
+        const halfHeight = 0.5;
 
-        // Ensanchamiento lateral.
+        // Qué tan achatadas serán las partes superior
+        // e inferior.
         //
-        // 1.00 = sin cambio
-        // 1.03 = +3 %
-        // 1.05 = +5 %
-        // 1.08 = +8 %
+        // 0.00 = esfera
+        // 0.15 = ligeramente achatada
+        // 0.25 = bastante achatada
         //
-        const xyScale = 1.05;
+        const flatten = 0.15;
 
         // =====================================================
-        // PROCESAR
+        // PROCESAR CADA GEOMETRÍA
         // =====================================================
 
-        for (let i = 0; i < position.count; i++) {
+        for (
+            let geometryId = 0;
+            geometryId < geometryInfo.length;
+            geometryId++
+        ) {
 
-            const p = i * 3;
+            const info = geometryInfo[geometryId];
 
-            let x = pos[p];
-            let y = pos[p + 1];
-            let z = pos[p + 2];
+            if (!info || !info.active) continue;
 
-            if (
-                !Number.isFinite(x) ||
-                !Number.isFinite(y) ||
-                !Number.isFinite(z)
+            const start = info.vertexStart;
+            const count = info.vertexCount;
+
+            if (count < 4) continue;
+
+            // -------------------------------------------------
+            // CENTRO LOCAL
+            // -------------------------------------------------
+
+            let centerX = 0;
+            let centerY = 0;
+            let centerZ = 0;
+
+            let validVertices = 0;
+
+            for (
+                let i = start;
+                i < start + count;
+                i++
             ) {
-                continue;
+
+                const p = i * 3;
+
+                const x = pos[p];
+                const y = pos[p + 1];
+                const z = pos[p + 2];
+
+                if (
+                    !Number.isFinite(x) ||
+                    !Number.isFinite(y) ||
+                    !Number.isFinite(z)
+                ) {
+                    continue;
+                }
+
+                centerX += x;
+                centerY += y;
+                centerZ += z;
+
+                validVertices++;
             }
 
+            if (validVertices === 0) continue;
+
+            centerX /= validVertices;
+            centerY /= validVertices;
+            centerZ /= validVertices;
+
             // -------------------------------------------------
-            // 1. CUADRATIZAR Z
+            // TRANSFORMACIÓN
             // -------------------------------------------------
 
-            const zCenter =
-                Math.round(z / zStep) * zStep;
+            for (
+                let i = start;
+                i < start + count;
+                i++
+            ) {
 
-            if (z > zCenter) {
+                const p = i * 3;
 
-                z = zCenter + zStep;
+                const x = pos[p];
+                const y = pos[p + 1];
+                const z = pos[p + 2];
 
-            } else {
+                if (
+                    !Number.isFinite(x) ||
+                    !Number.isFinite(y) ||
+                    !Number.isFinite(z)
+                ) {
+                    continue;
+                }
 
-                z = zCenter - zStep;
+                // ---------------------------------------------
+                // Coordenada vertical normalizada
+                // ---------------------------------------------
+
+                let nz =
+                    (z - centerZ) / halfHeight;
+
+                nz = THREE.MathUtils.clamp(nz, -1, 1);
+
+                // ---------------------------------------------
+                // Achatamiento de los extremos.
+                //
+                // La zona central permanece redondeada.
+                // Los extremos se vuelven más planos.
+                // ---------------------------------------------
+
+                const absZ = Math.abs(nz);
+
+                const flattenFactor =
+                    1 - flatten * Math.pow(absZ, 4);
+
+                // ---------------------------------------------
+                // Aplicamos únicamente una modificación
+                // MUY ligera a la altura.
+                // ---------------------------------------------
+
+                const newZ =
+                    centerZ +
+                    nz *
+                    halfHeight *
+                    flattenFactor;
+
+                pos[p + 2] = newZ;
             }
-
-            pos[p + 2] = z;
-
-            // -------------------------------------------------
-            // 2. ENSANCHAMIENTO LATERAL
-            //
-            // IMPORTANTE:
-            //
-            // No hacemos:
-            //
-            // x *= xyScale
-            // y *= xyScale
-            //
-            // porque eso movería la geometría.
-            //
-            // En su lugar, posteriormente debemos aplicar
-            // el ensanchamiento alrededor del centro de cada
-            // extrusión.
-            // -------------------------------------------------
         }
 
         position.needsUpdate = true;
 
         geometry.computeBoundingBox();
         geometry.computeBoundingSphere();
-
     });
+
+    console.log(
+        "✅ Sección redondeada con extremos achatados"
+    );
 }

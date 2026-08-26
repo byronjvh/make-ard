@@ -136,7 +136,7 @@ export function setCameraView(
     const controls = preview.sceneManager.controls;
 
     if (controls) {
-        controls.enabled = false;
+        controls.enabled = true;
 
         controls.target.copy(center);
 
