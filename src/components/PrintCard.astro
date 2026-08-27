@@ -1,11 +1,166 @@
 ---
-
+import Filament from "./icons/Filament.astro";
+import Ruler from "./icons/Ruler.astro";
+import Time from "./icons/Time.astro";
 ---
 
-<div class="print-card">
-    <h3>Título de la card</h3>
-</div>
+<article class="print-card">
+    <header>
+        <img
+            class="print-card-thumbnail"
+            src="https://media.printables.com/media/prints/203925/images/1875500_cd7c1d22-dfb1-4c56-8e28-71fd9454dc74/thumbs/inside/1280x960/jpg/7b62dfe39e94e61584a93da27d085074_display_large_20.webp"
+            alt=""
+        />
+        <div class="print-card-header-text">
+            <div>
+                <h3>Título de la card</h3>
+                <p class="print-card-description">
+                    Esto es una descripción corta del modelo
+                </p>
+            </div>
+            <div class="print-card-header-info">
+                <div>
+                    <span>
+                        <Time size="40" />
+                    </span>
+                    <h4>Print Time</h4>
+                    <p>2h 34m</p>
+                </div>
+                <span class="separator"></span>
+                <div>
+                    <span>
+                        <Filament />
+                    </span>
+                    <h4>Filament Used</h4>
+
+                    <p>24.6 g</p>
+                </div>
+                <span class="separator"></span>
+                <div>
+                    <span>
+                        <Ruler />
+                    </span>
+                    <h4>Dimensions</h4>
+                    <p>120×85×43 mm</p>
+                </div>
+            </div>
+        </div>
+    </header>
+    <ul class="print-card-list">
+        <li>0.20 mm</li>
+        <li>15% Gyroid</li>
+        <li>3 walls</li>
+        <li>PLA</li>
+        <li>0.4 mm nozzle</li>
+        <li>Supports</li>
+    </ul>
+    <footer>
+        <p>Made by @byronjvh</p>
+    </footer>
+</article>
 
 <script></script>
 
-<style></style>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .print-card {
+        width: 100%;
+        max-width: 560px;
+        aspect-ratio: 1600/1200;
+        background-color: bisque;
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        border-radius: 16px;
+        box-shadow: 0 10px 10px 6px rgba(0, 0, 0, 0.05);
+        gap: 28px;
+    }
+
+    .print-card header {
+        display: flex;
+        gap: 20px;
+        height: 160px;
+        max-height: 160px;
+    }
+
+    .print-card-header-text {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .print-card h3 {
+        padding-top: 8px;
+        height: 42px;
+        font-size: 28px;
+        font-family: "Merryweather";
+        margin: 0;
+    }
+
+    .print-card-header-info {
+        display: flex;
+        gap: 12px;
+        height: 100%;
+        font-size: 18px;
+        font-weight: 600;
+        font-family: "Ubuntu mono", sans-serif;
+    }
+
+    .print-card-header-info h4 {
+        font-family: "Google sans", sans-serif;
+        text-transform: uppercase;
+        font-size: 11px;
+    }
+
+    .print-card-header-info .separator {
+        width: 2px;
+        height: 100%;
+        background-color: rgb(55, 86, 87, 0.1);
+    }
+
+    .print-card-description {
+        font-size: 14px;
+        font-weight: 600;
+        opacity: 0.5;
+    }
+
+    .print-card-thumbnail {
+        width: 160px;
+        aspect-ratio: 1/1;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .print-card-list {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        padding: 0;
+        gap: 16px;
+        font-family: "Ubuntu mono", sans-serif;
+        font-weight: 600;
+        font-size: 18px;
+        border-top: 2px solid rgb(55, 86, 87, 0.1);
+        padding-top: 16px;
+    }
+
+    .print-card-list li {
+        font-size: 16px;
+        width: 100%;
+        max-width: 114px;
+        list-style: none;
+        margin-inline: auto;
+    }
+
+    footer {
+        font-size: 14px;
+        font-weight: 600;
+    }
+    footer p {
+        opacity: 0.5;
+    }
+</style>
