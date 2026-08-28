@@ -12,6 +12,7 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@lucide/astro": "^1.35.0",
     "astro": "^7.2.4",
     "gcode-preview": "^3.0.0-alpha.5",
     "three": "^0.185.1"

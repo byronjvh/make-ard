@@ -1,0 +1,35 @@
+---
+const {
+    size = 22,
+    class: className,
+    strokeWidth = "2.5px",
+    ...rest
+} = Astro.props;
+---
+
+<svg
+    width={size}
+    height={size}
+    viewBox="-1 0 40 33"
+    version="1.1"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xml:space="preserve"
+    class={className}
+    {...rest}
+>
+    <g transform="matrix(1.333333,0,0,1.333333,-648.027277,-190.728493)">
+        <g transform="matrix(0.033968,0,0,0.03008,484.372864,139.578366)">
+            <path
+                d="M842.165,241.161L842.165,426.413C842.165,477.534 805.411,519.038 760.14,519.038L159.969,519.038C114.698,519.038 77.944,477.534 77.944,426.413L77.944,241.161C77.944,190.039 114.698,148.535 159.969,148.535L760.14,148.535C805.411,148.535 842.165,190.039 842.165,241.161Z"
+                stroke="currentColor"
+                stroke-width="80px"
+                fill="none"></path>
+        </g>
+        <path
+            d="M506.61,159.726L500,166.336L493.39,159.726L493.39,155.191L506.61,155.191L506.61,159.726Z"
+            stroke="currentColor"
+            stroke-width={strokeWidth}
+            fill="none"></path>
+    </g>
+</svg>
