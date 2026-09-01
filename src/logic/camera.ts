@@ -114,7 +114,7 @@ export function setCameraView(
         Math.tan(fov / 2);
 
     // Un poco de margen
-    distance *= 1.1;
+    distance *= 1.0;
 
     // ==========================================
     // POSICIÓN
@@ -136,7 +136,7 @@ export function setCameraView(
     const controls = preview.sceneManager.controls;
 
     if (controls) {
-        controls.enabled = true;
+        controls.enabled = false;
 
         controls.target.copy(center);
 

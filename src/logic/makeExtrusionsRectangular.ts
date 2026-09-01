@@ -9,7 +9,6 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
         return;
     }
 
-    console.log("🔥 EXTRUSIONES → SECCIÓN CUADRADA");
 
     extrusions.traverse((obj) => {
 
@@ -173,5 +172,4 @@ export function makeExtrusionsRectangular(scene: THREE.Scene) {
 
     });
 
-    console.log("✅ Sección cuadrada aplicada");
 }
