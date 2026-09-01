@@ -9,6 +9,8 @@ import * as THREE from "three";
 
 export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
 
+    let ok = false;
+
     const originalGCode = await file.text();
 
     const result = removePurgeLines(originalGCode);
@@ -145,6 +147,8 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
         canvas,
     );
 
+    ok = initialImage ? true : false;
+
     if (initialImage) {
         window.dispatchEvent(
             new CustomEvent("gcode-preview-ready", {
@@ -180,6 +184,8 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
                 canvas,
             );
 
+            ok = image ? true : false;
+
             if (image) {
                 window.dispatchEvent(
                     new CustomEvent("gcode-preview-ready", {
@@ -198,6 +204,8 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
     document
         .querySelector(".gcode-container")
         ?.appendChild(cameraContainer);
+
+    return { ok };
 }
 
 

@@ -57,7 +57,7 @@
         uploadArea.classList.remove("drag-over");
     });
 
-    uploadArea.addEventListener("drop", (event) => {
+    uploadArea.addEventListener("drop", async (event) => {
         event.preventDefault();
 
         uploadArea.classList.remove("drag-over");
@@ -77,7 +77,10 @@
             return;
         }
 
-        processGCodeFile(file, canvas);
+        const result = await processGCodeFile(file, canvas);
+        if (result?.ok) {
+            uploadArea.classList.add("hide");
+        }
     });
 
     // =========================================================
@@ -93,8 +96,10 @@
 
         fileNameElement.textContent = file.name;
 
-        processGCodeFile(file, canvas);
-        // uploadArea.classList.add("hide");
+        const result = await processGCodeFile(file, canvas);
+        if (result?.ok) {
+            uploadArea.classList.add("hide");
+        }
     });
 </script>
 
