@@ -12,7 +12,7 @@ import {
 } from "@lucide/astro";
 ---
 
-<article class="print-card theme-blueprint">
+<article class="print-card theme-neon">
     <header>
         <img
             class="print-card-thumbnail"
@@ -121,7 +121,19 @@ import {
     </footer>
 </article>
 
-<script></script>
+<script>
+    window.addEventListener("gcode-preview-ready", (event) => {
+        const image = (event as CustomEvent).detail.image;
+
+        const preview = document.querySelector(
+            ".print-card-thumbnail",
+        ) as HTMLImageElement;
+
+        if (!preview) return;
+
+        preview.src = image;
+    });
+</script>
 
 <style>
     * {
@@ -132,6 +144,8 @@ import {
 
     .print-card {
         --bg-color: #fff;
+        --bg-img: #dfdfff;
+        --model-color: #d200e6;
         --border-color: rgba(0, 0, 0, 0.1);
         --font-title: "Montserrat", sans-serif;
         --font-data: "Ubuntu Mono", sans-serif;
@@ -225,6 +239,7 @@ import {
         aspect-ratio: 1/1;
         object-fit: cover;
         border-radius: 8px;
+        background-color: var(--bg-img);
     }
 
     .print-card-list {
@@ -280,6 +295,7 @@ import {
 
     .print-card-printer {
         font-weight: 600;
+        color: var(--description-color);
     }
 
     .signature {
@@ -287,22 +303,78 @@ import {
         color: var(--subtitle-color);
     }
 
-    /* Themes */
-    .theme-blueprint {
-        --bg-color: #e8f1f7;
-        --border-color: rgba(25, 76, 110, 0.18);
+    /* 1. Blueprint */
+    .print-card.theme-blueprint {
+        --font-title: "Montserrat", sans-serif;
+        --bg-color: #eef3fb;
+        --bg-img: #dbe6fa;
+        --border-color: rgba(20, 50, 90, 0.15);
+        --bg-footer: rgba(20, 50, 90, 0.08);
+        --icon-color: #2f6fed;
+        --icon-color-2: #6a93e0;
+        --title-color: #0f2a52;
+        --description-color: #3c5578;
+        --data-color: #10233f;
+        --subtitle-color: #5c7291;
+    }
 
+    /* 2. Carbono */
+    .print-card.theme-carbono {
+        --font-title: "Righteous", sans-serif;
+        --bg-color: #1b1e24;
+        --bg-img: #2a2e37;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --bg-footer: rgba(255, 255, 255, 0.06);
+        --icon-color: #ff7a30;
+        --icon-color-2: #c95d20;
+        --title-color: #f4f4f2;
+        --description-color: #b7bac2;
+        --data-color: #f1f1ef;
+        --subtitle-color: #8a8e98;
+    }
+
+    /* 3. Cobre */
+    .print-card.theme-cobre {
+        --font-title: "Merriweather", serif;
+        --bg-color: #f6efe3;
+        --bg-img: #ecdec4;
+        --border-color: rgba(120, 80, 40, 0.15);
+        --bg-footer: rgba(120, 80, 40, 0.1);
+        --icon-color: #b5651d;
+        --icon-color-2: #8a4a15;
+        --title-color: #3c2410;
+        --description-color: #6b4c30;
+        --data-color: #2e1c0c;
+        --subtitle-color: #8a7156;
+    }
+
+    /* 4. Matcha */
+    .print-card.theme-matcha {
+        --font-title: "Great Vibes", cursive;
+        --bg-color: #eef3ea;
+        --bg-img: #dbe6d3;
+        --border-color: rgba(60, 100, 50, 0.15);
+        --bg-footer: rgba(60, 100, 50, 0.08);
+        --icon-color: #4c7a3f;
+        --icon-color-2: #7ba36a;
+        --title-color: #1f3a18;
+        --description-color: #47613c;
+        --data-color: #142c0d;
+        --subtitle-color: #6c8862;
+    }
+
+    /* 5. Neón */
+    .print-card.theme-neon {
         --font-title: "Goldman", sans-serif;
-        --font-data: "Ubuntu Mono", sans-serif;
-        --font-default: "Google sans", sans-serif;
-
-        --bg-footer: #d4e4ee;
-
-        --icon-color: #1673a5;
-        --icon-color-2: #066395;
-        --title-color: #123d5b;
-        --description-color: #55758a;
-        --data-color: #163c54;
-        --subtitle-color: #58778a;
+        --bg-color: #0d0f1a;
+        --bg-img: #1a1d2e;
+        --border-color: rgba(255, 255, 255, 0.08);
+        --bg-footer: rgba(255, 255, 255, 0.05);
+        --icon-color: #37e6e6;
+        --icon-color-2: #ff3fa4;
+        --title-color: #f2f8ff;
+        --description-color: #9fb4c9;
+        --data-color: #e8fbff;
+        --subtitle-color: #718aa3;
     }
 </style>

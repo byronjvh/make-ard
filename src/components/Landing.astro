@@ -6,15 +6,85 @@ import PrintCard from "./PrintCard.astro";
 ---
 
 <div id="container">
+	<header>
+		<p class="logo">Make-ard</p>
+		<nav>
+			<a href="#">Inicio</a>
+			<a href="#">Acerca de</a>
+			<a href="#">Contacto</a>
+		</nav>
+	</header>
+	<h1 class="landing-title">
+		Tu impresora hace la pieza, make-ard hace la ficha
+	</h1>
+	<p class="landing-tagline">
+		Genera cards con los datos de tu modelo en segundos, elige un theme y
+		compártelas donde quieras
+	</p>
+	<div>
+		<div>
+			<label for="">Vista</label>
+			<select name="" id="">
+				<option value="">Isometric FL</option>
+				<option value="">Isometric FR</option>
+				<option value="">Isometric BL</option>
+				<option value="">Isometric BR</option>
+				<option value="">Top</option>
+				<option value="">Front</option>
+				<option value="">Left</option>
+				<option value="">Right</option>
+			</select>
+		</div>
+		<div>
+			<label for="">Zoom</label>
+			<select name="" id="">
+				<option value="">Close-up</option>
+				<option value="">Far</option>
+			</select>
+		</div>
+	</div>
 	<GCodeViewer />
 	<PrintCard />
 </div>
 
 <style>
+	* {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
+	}
+
+	.log {
+		font-family: "Google sans", sans-serif;
+		font-weight: bold;
+		font-size: 24px;
+	}
+
 	#container {
 		width: 100svw;
 		display: flex;
 		align-items: center;
 		flex-direction: column;
 	}
+
+	.landing-title {
+		font-family: "Ubuntu sans", sans-serif;
+		font-weight: 900;
+		font-size: 40px;
+		max-width: 720px;
+		text-align: center;
+		text-wrap: balance;
+		margin-bottom: 8px;
+	}
+
+	.landing-tagline {
+		color: #666;
+		font-family: "Google sans", sans-serif;
+		font-size: 20px;
+		max-width: 720px;
+		text-align: center;
+		text-wrap: pretty;
+	}
 </style>
+
+<script></script>
