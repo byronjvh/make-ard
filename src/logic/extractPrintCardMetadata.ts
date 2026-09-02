@@ -1,3 +1,5 @@
+import type { GCodeBounds } from "./GCodeRemovePurgeLines";
+
 export interface PrintCardMetadata {
 
     modelName: string | undefined;
@@ -36,7 +38,8 @@ export interface PrintCardMetadata {
 
 export function extractPrintCardMetadata(
     gcode: string,
-    filename?: string
+    filename?: string,
+    bounds?: GCodeBounds | null
 ): PrintCardMetadata {
 
     const metadata: PrintCardMetadata = {
@@ -94,7 +97,6 @@ export function extractPrintCardMetadata(
     function findNumber(
         patterns: RegExp[]
     ): number | undefined {
-
         const value = findMatch(patterns);
 
         if (!value) return undefined;
@@ -151,15 +153,25 @@ export function extractPrintCardMetadata(
         /;\s*machine\s*[:=]\s*(.+)/i
     ]);
 
+    if (metadata.printer) {
+        metadata.printer = metadata.printer
+            .split("@")[0]
+            .trim();
+    }
+
 
     // =====================================================
     // INFILL
     // =====================================================
 
     metadata.infill = findNumber([
-        /;\s*fill[_ ]density\s*[:=]\s*([\d.]+)/i,
-        /;\s*infill[_ ]density\s*[:=]\s*([\d.]+)/i,
-        /;\s*infill\s*[:=]\s*([\d.]+)/i
+        /;\s*sparse_infill_density\s*[:=]\s*([\d.]+)%?/i,
+        /;\s*fill_density\s*[:=]\s*([\d.]+)%?/i,
+        /;\s*infill_density\s*[:=]\s*([\d.]+)%?/i,
+        /;\s*infill\s*[:=]\s*([\d.]+)%?/i,
+
+        /;\s*\*fill[\_ ]density\s*[:=]\s*([\d.]+)%?/i,
+        /;\s*\*infill[\_ ]density\s*[:=]\s*([\d.]+)%?/i,
     ]);
 
 
@@ -214,17 +226,25 @@ export function extractPrintCardMetadata(
     // =====================================================
 
     const supportText = findMatch([
-        /;\s*support[_ ]material\s*[:=]\s*(.+)/i,
-        /;\s*supports\s*[:=]\s*(.+)/i,
-        /;\s*support[_ ]enabled\s*[:=]\s*(.+)/i
+        /;\s*\*support[\_ ]material\s*[:=]\s*(.+)/i,
+        /;\s*\*supports\s*[:=]\s*(.+)/i,
+        /;\s*\*support[\_ ]enabled\s*[:=]\s*(.+)/i,
     ]);
 
     if (supportText !== undefined) {
 
         metadata.supports =
-            /true|yes|on|1|enabled/i.test(
-                supportText
-            );
+            /true|yes|on|1|enabled/i.test(supportText);
+
+    } else {
+
+        const hasSupportType = lines.some(line =>
+            /;\s*TYPE:\s*(SUPPORT|SUPPORT[-_ ]INTERFACE)\b/i.test(line)
+        );
+
+        if (hasSupportType) {
+            metadata.supports = true;
+        }
     }
 
 
@@ -232,9 +252,13 @@ export function extractPrintCardMetadata(
     // DIMENSIONES
     // =====================================================
 
-    metadata.dimensions =
-        calculateDimensions(gcode);
-
+    metadata.dimensions = bounds
+        ? {
+            x: bounds.sizeX,
+            y: bounds.sizeY,
+            z: bounds.sizeZ,
+        }
+        : undefined;
 
     return metadata;
 }
@@ -272,111 +296,4 @@ function parsePrintTime(
     return seconds > 0
         ? seconds
         : undefined;
-}
-
-function calculateDimensions(
-    gcode: string
-): PrintCardMetadata["dimensions"] {
-
-    let minX = Infinity;
-    let maxX = -Infinity;
-
-    let minY = Infinity;
-    let maxY = -Infinity;
-
-    let minZ = Infinity;
-    let maxZ = -Infinity;
-
-    const lines = gcode.split(/\r?\n/);
-
-    let x = 0;
-    let y = 0;
-    let z = 0;
-
-    let absolutePositioning = true;
-
-    for (const line of lines) {
-
-        const clean = line
-            .split(";")[0]
-            .trim();
-
-        if (!clean) continue;
-
-        if (/^G90\b/i.test(clean)) {
-            absolutePositioning = true;
-            continue;
-        }
-
-        if (/^G91\b/i.test(clean)) {
-            absolutePositioning = false;
-            continue;
-        }
-
-        if (!/^G0?1\b/i.test(clean)) {
-            continue;
-        }
-
-        const xMatch =
-            clean.match(/\bX(-?\d+(?:\.\d+)?)/i);
-
-        const yMatch =
-            clean.match(/\bY(-?\d+(?:\.\d+)?)/i);
-
-        const zMatch =
-            clean.match(/\bZ(-?\d+(?:\.\d+)?)/i);
-
-        if (xMatch) {
-
-            const value = parseFloat(xMatch[1]);
-
-            x = absolutePositioning
-                ? value
-                : x + value;
-        }
-
-        if (yMatch) {
-
-            const value = parseFloat(yMatch[1]);
-
-            y = absolutePositioning
-                ? value
-                : y + value;
-        }
-
-        if (zMatch) {
-
-            const value = parseFloat(zMatch[1]);
-
-            z = absolutePositioning
-                ? value
-                : z + value;
-        }
-
-        minX = Math.min(minX, x);
-        maxX = Math.max(maxX, x);
-
-        minY = Math.min(minY, y);
-        maxY = Math.max(maxY, y);
-
-        minZ = Math.min(minZ, z);
-        maxZ = Math.max(maxZ, z);
-    }
-
-    if (
-        !Number.isFinite(minX) ||
-        !Number.isFinite(maxX) ||
-        !Number.isFinite(minY) ||
-        !Number.isFinite(maxY) ||
-        !Number.isFinite(minZ) ||
-        !Number.isFinite(maxZ)
-    ) {
-        return undefined;
-    }
-
-    return {
-        x: Number((maxX - minX).toFixed(2)),
-        y: Number((maxY - minY).toFixed(2)),
-        z: Number((maxZ - minZ).toFixed(2))
-    };
 }

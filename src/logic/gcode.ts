@@ -1,4 +1,6 @@
-interface GCodeMove {
+import type { GCodeBounds } from "./GCodeRemovePurgeLines";
+
+export interface GCodeMove {
     lineIndex: number;
 
     command: string;
@@ -18,9 +20,10 @@ interface GCodeMove {
     distance: number;
 
     isExtrusion: boolean;
+    hasExtrusion: boolean;
 }
 
-interface PurgeCandidate {
+export interface PurgeCandidate {
     startLine: number;
     endLine: number;
 
@@ -38,7 +41,7 @@ interface PurgeCandidate {
     score: number;
 }
 
-interface PurgeOptions {
+export interface PurgeOptions {
     // Movimiento mínimo para considerar una posible purga
     minLength?: number;
 
@@ -58,7 +61,7 @@ interface PurgeOptions {
     minScore?: number;
 }
 
-interface PurgeResult {
+export interface PurgeResult {
     gcode: string;
 
     removed: boolean;
@@ -66,4 +69,5 @@ interface PurgeResult {
     removedLines: number[];
 
     candidates: PurgeCandidate[];
+    bounds: GCodeBounds | null;
 }

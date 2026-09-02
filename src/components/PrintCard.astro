@@ -12,7 +12,7 @@ import {
 } from "@lucide/astro";
 ---
 
-<article class="print-card theme-neon">
+<article id="print-card" class="print-card theme-carbono hide">
     <header>
         <img
             class="print-card-thumbnail"
@@ -61,7 +61,7 @@ import {
                         />
                     </span>
                     <h4>Dimensions</h4>
-                    <p>120×85×43 mm</p>
+                    <p>999×999×999 mm</p>
                 </div>
             </div>
         </div>
@@ -122,8 +122,23 @@ import {
 </article>
 
 <script>
+    import { formatMetadata } from "../logic/formatMetadata";
+    import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
+    let metadata: PrintCardMetadata | undefined;
+
     window.addEventListener("gcode-preview-ready", (event) => {
-        const image = (event as CustomEvent).detail.image;
+        const detail = (event as CustomEvent).detail;
+
+        const image = detail.image;
+        metadata = detail.metadata;
+
+        if (!metadata) {
+            console.warn("No metadata received");
+            return;
+        }
+
+        console.log("parsed metadata", formatMetadata(metadata));
+        console.log("metadata", metadata);
 
         const preview = document.querySelector(
             ".print-card-thumbnail",
@@ -168,8 +183,6 @@ import {
         border-radius: 16px;
         box-shadow: 0 10px 10px 6px rgba(0, 0, 0, 0.05);
         gap: 20px;
-        margin-bottom: 32px;
-        margin-top: 32px;
         font-family: var(--font-default);
     }
 
@@ -333,6 +346,10 @@ import {
         --subtitle-color: #8a8e98;
     }
 
+    .print-card.theme-carbono h3 {
+        letter-spacing: 2px;
+    }
+
     /* 3. Cobre */
     .print-card.theme-cobre {
         --font-title: "Merriweather", serif;
@@ -376,5 +393,9 @@ import {
         --description-color: #9fb4c9;
         --data-color: #e8fbff;
         --subtitle-color: #718aa3;
+    }
+
+    .print-card.hide {
+        display: none;
     }
 </style>

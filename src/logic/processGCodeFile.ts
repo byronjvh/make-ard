@@ -1,7 +1,6 @@
 import { GCodePreview } from "gcode-preview";
 import { removePurgeLines } from "./GCodeRemovePurgeLines";
-import { getGCodeBounds } from "./getGCodeBounds";
-import { setCameraView, type CameraAngle } from "./camera";
+import { setCameraView } from "./camera";
 import { extractPrintCardMetadata } from "./extractPrintCardMetadata";
 import { modelCenter } from "./modelCenter";
 import { makeExtrusionsRectangular } from "./makeExtrusionsRectangular";
@@ -16,8 +15,7 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
     const result = removePurgeLines(originalGCode);
 
     const gcode = result.gcode;
-
-    const bounds = getGCodeBounds(gcode);
+    const bounds = result.bounds;
 
     if (!bounds) {
         console.error("No se pudo calcular el volumen del G-code.");
@@ -52,12 +50,10 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
         renderTravel: false,
         renderExtrusion: true,
         renderTubes: true,
-        extrusionWidth: 0.8,
+        extrusionWidth: 0.6,
 
         lineWidth: 1,
         lineHeight,
-
-        backgroundColor: "#00000000",
 
         extrusionColor: "#1e90ff",
     });
@@ -129,17 +125,9 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
 
     makeExtrusionsRectangular(preview.sceneManager.scene);
 
-    const cameraButtons = [
-        "isometric",
-        "isometric2",
-        "front",
-        "back",
-        "left",
-        "right",
-        "top",
-    ] as const;
+    // Vista inicial
+    setCameraView(preview, "isoFL");
 
-    setCameraView(preview, cameraButtons[0]);
     const initialImage = await captureCanvas(
         renderer,
         scene,
@@ -154,62 +142,27 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
             new CustomEvent("gcode-preview-ready", {
                 detail: {
                     image: initialImage,
-                    metadata: extractPrintCardMetadata(gcode),
+                    metadata: extractPrintCardMetadata(
+                        gcode,
+                        file.name,
+                        bounds,
+                    ),
                 },
             }),
         );
     }
 
-    const cameraContainer = document.createElement("div");
-
-    cameraContainer.style.display = "flex";
-    cameraContainer.style.flexWrap = "wrap";
-    cameraContainer.style.gap = "5px";
-    cameraContainer.style.marginTop = "10px";
-
-    for (const angle of cameraButtons) {
-        const button = document.createElement("button");
-
-        button.textContent = angle;
-
-        button.style.cursor = "pointer";
-        button.style.padding = "6px 10px";
-
-        button.addEventListener("click", async () => {
-            setCameraView(preview, angle as CameraAngle);
-            const image = await captureCanvas(
-                renderer,
-                scene,
-                camera,
-                canvas,
-            );
-
-            ok = image ? true : false;
-
-            if (image) {
-                window.dispatchEvent(
-                    new CustomEvent("gcode-preview-ready", {
-                        detail: {
-                            image,
-                            metadata: extractPrintCardMetadata(gcode),
-                        },
-                    }),
-                );
-            }
-        });
-
-        cameraContainer.appendChild(button);
-    }
-
-    document
-        .querySelector(".gcode-container")
-        ?.appendChild(cameraContainer);
-
-    return { ok };
+    return {
+        ok,
+        preview,
+        renderer,
+        scene,
+        camera,
+    };
 }
 
 
-async function captureCanvas(
+export async function captureCanvas(
     renderer: THREE.WebGLRenderer,
     scene: THREE.Scene,
     camera: THREE.Camera,

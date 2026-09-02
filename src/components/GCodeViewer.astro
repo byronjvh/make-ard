@@ -3,14 +3,21 @@
 ---
 
 <div class="gcode-container">
-    <div id="upload-area" class="upload-area">
-        <input id="gcode-file" type="file" accept=".gcode,.gc,.gco" />
-
-        <label for="gcode-file"> Seleccionar G-code </label>
-
-        <p id="file-name">Ningún archivo seleccionado</p>
-
-        <p class="drop-hint">o arrastra tu G-code aquí</p>
+    <div id="upload-wrapper" class="upload-wrapper">
+        <div id="upload-area" class="upload-area">
+            <input id="gcode-file" type="file" accept=".gcode,.gc,.gco" />
+    
+            <label for="gcode-file"> Seleccionar G-code o imagen </label>
+    
+            <p id="file-name">Ningún archivo seleccionado</p>
+    
+            <p class="drop-hint">o arrastra tu archivo aquí</p>
+        </div>
+        <div>
+            <p class="upload-text">
+                Carga tu G-code o empieza con una imagen para generar tu Print Card.
+            </p>
+        </div>
     </div>
 
     <div class="preview-wrapper">
@@ -19,20 +26,37 @@
 </div>
 
 <script>
+    import * as THREE from "three";
+    import { setCameraView, zoomOptions, type CameraAngle, type Zoom } from "../logic/camera";
     import { processGCodeFile } from "../logic/processGCodeFile";
+    import { captureCanvas } from "../logic/processGCodeFile";
+import { cameraAnglesOptions } from "../logic/camera";
 
     // =========================================================
     // ELEMENTOS
     // =========================================================
 
     const fileInput = document.querySelector<HTMLInputElement>("#gcode-file");
-
     const canvas = document.querySelector<HTMLCanvasElement>("#gcode-canvas");
-
     const fileNameElement = document.querySelector<HTMLElement>("#file-name");
     const uploadArea = document.querySelector<HTMLElement>("#upload-area");
+    const uploadWrapper = document.querySelector<HTMLElement>("#upload-wrapper");
+    const printCard = document.querySelector<HTMLElement>("#print-card");
+    const controls = document.querySelector<HTMLElement>("#controls");
+    const viewSelect = document.querySelector<HTMLElement>("#view-select");
+    const zoomSelect = document.querySelector<HTMLElement>("#zoom-select");
 
-    if (!fileInput || !canvas || !fileNameElement || !uploadArea) {
+    if (
+        !fileInput ||
+        !canvas ||
+        !fileNameElement ||
+        !uploadArea ||
+        !uploadWrapper ||
+        !printCard ||
+        !controls ||
+        !viewSelect ||
+        !zoomSelect
+    ) {
         throw new Error("No se encontraron los elementos necesarios");
     }
 
@@ -43,10 +67,18 @@
     canvas.width = 2000;
     canvas.height = 2000;
 
+    let file: File | undefined = undefined;
+    let preview: any = null;
+    let renderer: THREE.WebGLRenderer | null = null;
+    let scene: THREE.Scene | null = null;
+    let camera: THREE.Camera | null = null;
+    let currentImageUrl: string | null = null;
+    let currentAngle: CameraAngle = cameraAnglesOptions[0];
+    let currentZoom: Zoom = zoomOptions[0];
     // =========================================================
     // DRAG & DROP
     // =========================================================
-
+    
     uploadArea.addEventListener("dragover", (event) => {
         event.preventDefault();
 
@@ -62,11 +94,14 @@
 
         uploadArea.classList.remove("drag-over");
 
-        const file = event.dataTransfer?.files?.[0];
+        const droppedFile = event.dataTransfer?.files?.[0];
 
-        if (!file) return;
+        if (!droppedFile) return;
 
-        const extension = file.name.split(".").pop()?.toLowerCase();
+        const extension = droppedFile.name
+            .split(".")
+            .pop()
+            ?.toLowerCase();
 
         if (
             extension !== "gcode" &&
@@ -77,20 +112,62 @@
             return;
         }
 
+        file = droppedFile;
+
+        fileNameElement.textContent = file.name;
+
         const result = await processGCodeFile(file, canvas);
+
         if (result?.ok) {
-            uploadArea.classList.add("hide");
+            preview = result.preview;
+            renderer = result.renderer;
+            scene = result.scene;
+            camera = result.camera;
+
+            uploadWrapper.classList.add("hide");
+            printCard.classList.remove("hide");
+            controls.classList.remove("hide");
         }
     });
-
+    
     // =========================================================
     // CARGAR G-CODE
     // =========================================================
 
+    async function updatePrintCardImage() {
+        if (!preview || !renderer || !scene || !camera || !canvas) {
+            console.warn("No se ha cargado ningún modelo");
+            return;
+        }
+
+        const image = await captureCanvas(
+            renderer,
+            scene,
+            camera,
+            canvas,
+        );
+
+        if (!image) return;
+
+        if (currentImageUrl) {
+            URL.revokeObjectURL(currentImageUrl);
+        }
+
+        currentImageUrl = image;
+
+        window.dispatchEvent(
+            new CustomEvent("gcode-preview-ready", {
+                detail: {
+                    image,
+                },
+            }),
+        );
+    }
+
     fileInput.addEventListener("change", async (event) => {
         const input = event.currentTarget as HTMLInputElement;
 
-        const file = input.files?.[0];
+        file = input.files?.[0];
 
         if (!file) return;
 
@@ -98,24 +175,95 @@
 
         const result = await processGCodeFile(file, canvas);
         if (result?.ok) {
-            uploadArea.classList.add("hide");
+            preview = result.preview;
+            renderer = result.renderer;
+            scene = result.scene;
+            camera = result.camera;
+
+            uploadWrapper.classList.add("hide");
+            printCard.classList.remove("hide");
+            controls.classList.remove("hide");
         }
+    });
+
+    
+    viewSelect.addEventListener("change", async (event) => {
+        if (!preview) return;
+
+        const select = event.currentTarget as HTMLSelectElement;
+        const selectedValue = select.value as CameraAngle;
+
+        if (!selectedValue) return;
+
+        currentAngle = selectedValue;
+
+        setCameraView(
+            preview,
+            currentAngle,
+            currentZoom,
+        );
+
+        await updatePrintCardImage();
+    });
+    
+    zoomSelect.addEventListener("change", async (event) => {
+        if (!preview) return;
+
+        const select = event.currentTarget as HTMLSelectElement;
+        const selectedValue = select.value as Zoom;
+
+        if (!selectedValue) return;
+
+        currentZoom = selectedValue;
+
+        setCameraView(
+            preview,
+            currentAngle,
+            currentZoom,
+        );
+
+        await updatePrintCardImage();
     });
 </script>
 
 <style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Google Sans", sans-serif;
+    }
     .gcode-container {
+        
+    }
+
+    .upload-wrapper {
+        display: flex;
+        gap: 16px;
+    }
+
+    .upload-text {
+        font-size: 24px;
+        max-width: 500px;
+        color: #333;
+        text-align: left;
+        padding-block: 16px;
     }
 
     .upload-area {
         position: relative;
+        aspect-ratio: 1/1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 20px
 
-        padding: 2rem;
-
+        align-items: center;
         text-align: center;
 
         border: 2px dashed transparent;
         border-radius: 12px;
+        border-color: #8080aa;
 
         transition:
             border-color 0.15s ease,
@@ -152,7 +300,7 @@
         font-weight: 600;
     }
 
-    .upload-area.hide {
+    .upload-wrapper.hide {
         display: none;
     }
 
@@ -163,5 +311,7 @@
         position: absolute;
         pointer-events: none;
         z-index: -9999;
+        left: 0;
+        top: 0;
     }
 </style>

@@ -1,17 +1,17 @@
 ---
-import astroLogo from "../assets/astro.svg";
-import background from "../assets/background.svg";
 import GCodeViewer from "./GCodeViewer.astro";
 import PrintCard from "./PrintCard.astro";
+import GitHub from "./icons/Github.astro";
 ---
 
 <div id="container">
 	<header>
-		<p class="logo">Make-ard</p>
+		<a href="/" class="logo-link">
+			<p class="logo">Make-ard</p>
+		</a>
 		<nav>
-			<a href="#">Inicio</a>
-			<a href="#">Acerca de</a>
-			<a href="#">Contacto</a>
+			<a class="nav-link" href="#">Acerca de</a>
+			<a class="nav-link" href="#"><GitHub />byronjvh</a>
 		</nav>
 	</header>
 	<h1 class="landing-title">
@@ -21,30 +21,20 @@ import PrintCard from "./PrintCard.astro";
 		Genera cards con los datos de tu modelo en segundos, elige un theme y
 		compártelas donde quieras
 	</p>
-	<div>
-		<div>
-			<label for="">Vista</label>
-			<select name="" id="">
-				<option value="">Isometric FL</option>
-				<option value="">Isometric FR</option>
-				<option value="">Isometric BL</option>
-				<option value="">Isometric BR</option>
-				<option value="">Top</option>
-				<option value="">Front</option>
-				<option value="">Left</option>
-				<option value="">Right</option>
-			</select>
+	<GCodeViewer />
+	<section class="printCard-container">
+		<PrintCard />
+	</section>
+	<div id="controls" class="controls hide">
+		<div class="selec-wrapper">
+			<label for="view-select">Vista</label>
+			<select name="view" id="view-select"> </select>
 		</div>
-		<div>
-			<label for="">Zoom</label>
-			<select name="" id="">
-				<option value="">Close-up</option>
-				<option value="">Far</option>
-			</select>
+		<div class="selec-wrapper">
+			<label for="zoom-select">Zoom</label>
+			<select name="zoom" id="zoom-select"> </select>
 		</div>
 	</div>
-	<GCodeViewer />
-	<PrintCard />
 </div>
 
 <style>
@@ -54,17 +44,57 @@ import PrintCard from "./PrintCard.astro";
 		box-sizing: border-box;
 	}
 
-	.log {
-		font-family: "Google sans", sans-serif;
+	header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		padding: 16px 32px;
+		max-width: 1000px;
+	}
+
+	nav {
+		display: flex;
+		gap: 16px;
+		align-items: center;
+	}
+
+	.nav-link {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+		font-family: "Google Sans", sans-serif;
+		font-weight: 500;
+		font-size: 16px;
+		color: #333;
+		text-decoration: none;
+	}
+
+	.logo-link {
+		text-decoration: none;
+		color: #333;
+	}
+
+	.logo {
+		font-family: "Ubuntu sans", sans-serif;
 		font-weight: bold;
+		font-style: italic;
 		font-size: 24px;
+		letter-spacing: -1px;
 	}
 
 	#container {
 		width: 100svw;
+		max-width: 100svw;
 		display: flex;
 		align-items: center;
 		flex-direction: column;
+	}
+
+	.printCard-container {
+		width: 100%;
+		max-width: 900px;
+		display: flex;
 	}
 
 	.landing-title {
@@ -74,7 +104,7 @@ import PrintCard from "./PrintCard.astro";
 		max-width: 720px;
 		text-align: center;
 		text-wrap: balance;
-		margin-bottom: 8px;
+		margin-block: 8px;
 	}
 
 	.landing-tagline {
@@ -84,7 +114,70 @@ import PrintCard from "./PrintCard.astro";
 		max-width: 720px;
 		text-align: center;
 		text-wrap: pretty;
+		margin-bottom: 28px;
+	}
+
+	.controls.hide {
+		display: none;
+	}
+
+	.controls {
+		width: 100%;
+		max-width: 900px;
+		display: flex;
+		gap: 16px;
+		margin-top: 8px;
+	}
+
+	.selec-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 4px;
+	}
+	/* un estilo muy bonito para los selectores y las options */
+	.selec-wrapper label {
+		font-family: "Google Sans", sans-serif;
+		font-size: 16px;
+		font-weight: 500;
+		color: #333;
+	}
+
+	.selec-wrapper select {
+		padding: 4px 8px;
+		border-radius: 4px;
+		border: 1px solid #ccc;
+		font-family: "Google Sans", sans-serif;
+		font-size: 14px;
+		font-weight: 500;
+		background-color: #fff;
+		color: #333;
 	}
 </style>
 
-<script></script>
+<script>
+	const dictionaryAngles = {
+		isoFL: "Isometric FL",
+		isoFR: "Isometric FR",
+		isoBL: "Isometric BL",
+		isoBR: "Isometric BR",
+		top: "Top",
+		front: "Front",
+		left: "Left",
+		right: "Right",
+		back: "Back",
+	};
+	import { cameraAnglesOptions } from "../logic/camera";
+	import { zoomOptions } from "../logic/camera";
+	for (const zoom of zoomOptions) {
+		const option = document.createElement("option");
+		option.value = zoom;
+		option.textContent = zoom;
+		document?.getElementById("zoom-select")?.appendChild(option);
+	}
+	for (const angle of cameraAnglesOptions) {
+		const option = document.createElement("option");
+		option.value = angle;
+		option.textContent = dictionaryAngles[angle] || angle;
+		document?.getElementById("view-select")?.appendChild(option);
+	}
+</script>

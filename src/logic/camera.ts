@@ -1,30 +1,65 @@
 import * as THREE from "three";
 
 export type CameraAngle =
-    | "isometric"
-    | "isometric2"
+    | "isoFL"
+    | "isoFR"
+    | "isoBL"
+    | "isoBR"
     | "front"
     | "back"
     | "left"
     | "right"
     | "top";
 
+export type Zoom =
+    | "Standard"
+    | "Close-up"
+    | "Far"
+
+export const cameraAnglesOptions = [
+    "isoFL",
+    "isoFR",
+    "isoBL",
+    "isoBR",
+    "front",
+    "back",
+    "left",
+    "right",
+    "top",
+] as const;
+export const zoomOptions = [
+    "Standard",
+    "Close-up",
+    "Far",
+] as const;
+
 const CAMERA_DIRECTIONS: Record<
     CameraAngle,
     THREE.Vector3
 > = {
-    isometric: new THREE.Vector3(1, 1, 1),
-    isometric2: new THREE.Vector3(-1, 1, 1),
+    isoFL: new THREE.Vector3(1, 1, 1),
+    isoFR: new THREE.Vector3(-1, 1, 1),
+    isoBL: new THREE.Vector3(1, 1, -1),
+    isoBR: new THREE.Vector3(-1, 1, -1),
     front: new THREE.Vector3(0, 0, 1),
     back: new THREE.Vector3(0, 0, -1),
     left: new THREE.Vector3(-1, 0, 0),
     right: new THREE.Vector3(1, 0, 0),
     top: new THREE.Vector3(0, 1, 0),
 };
+const CAMERA_ZOOM: Record<
+    Zoom,
+    number
+> = {
+    "Standard": 0.98,
+    "Close-up": 0.85,
+    "Far": 1.2,
+};
 
 export function setCameraView(
     preview: any,
     angle: CameraAngle,
+    zoom: Zoom = "Standard",
 ) {
     const camera = preview?.sceneManager.camera;
     const scene = preview?.sceneManager.scene;
@@ -114,7 +149,7 @@ export function setCameraView(
         Math.tan(fov / 2);
 
     // Un poco de margen
-    distance *= 1.0;
+    distance *= CAMERA_ZOOM[zoom];
 
     // ==========================================
     // POSICIÓN
@@ -150,4 +185,5 @@ export function setCameraView(
         direction,
     };
 }
+
 
