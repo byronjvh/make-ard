@@ -34,6 +34,10 @@ import GitHub from "./icons/Github.astro";
 			<label for="zoom-select">Zoom</label>
 			<select name="zoom" id="zoom-select"> </select>
 		</div>
+		<div class="selec-wrapper">
+			<label for="theme-select">Tema</label>
+			<select name="theme" id="theme-select"> </select>
+		</div>
 	</div>
 </div>
 
@@ -179,5 +183,37 @@ import GitHub from "./icons/Github.astro";
 		option.value = angle;
 		option.textContent = dictionaryAngles[angle] || angle;
 		document?.getElementById("view-select")?.appendChild(option);
+	}
+
+	const THEMES = [
+		"theme-blueprint",
+		"theme-carbono",
+		"theme-matcha",
+		"theme-cobre",
+		"theme-neon",
+	] as const;
+
+	const dictionaryThemes = {
+		"theme-blueprint": "Blueprint",
+		"theme-carbono": "Carbono",
+		"theme-matcha": "Matcha",
+		"theme-cobre": "Cobre",
+		"theme-neon": "Neon",
+	};
+
+	for (const theme of THEMES) {
+		const option = document.createElement("option");
+		option.value = theme;
+		option.textContent = dictionaryThemes[theme] || theme;
+		document?.getElementById("theme-select")?.appendChild(option);
+		document
+			?.getElementById("theme-select")
+			?.addEventListener("change", (event) => {
+				const selectedTheme = (event.target as HTMLSelectElement).value;
+				const printCard = document.getElementById("print-card");
+				if (!printCard) return;
+				printCard.classList.remove(...THEMES);
+				printCard.classList.add(selectedTheme);
+			});
 	}
 </script>
