@@ -1,12 +1,12 @@
 import { GCodePreview } from "gcode-preview";
 import { removePurgeLines } from "./GCodeRemovePurgeLines";
-import { setCameraView } from "./camera";
+import { cameraAnglesOptions, setCameraView, zoomOptions, type CameraAngle, type Zoom } from "./camera";
 import { extractPrintCardMetadata } from "./extractPrintCardMetadata";
 import { modelCenter } from "./modelCenter";
 import { makeExtrusionsRectangular } from "./makeExtrusionsRectangular";
 import * as THREE from "three";
 
-export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
+export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, modelColor: string, currentAngle: CameraAngle = cameraAnglesOptions[0], currentZoom: Zoom = zoomOptions[0]) {
 
     let ok = false;
 
@@ -55,7 +55,7 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
         lineWidth: 1,
         lineHeight,
 
-        extrusionColor: "#1e90ff",
+        extrusionColor: modelColor,
     });
 
     const renderer = (preview.sceneManager as any).renderer;
@@ -126,7 +126,7 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement) {
     makeExtrusionsRectangular(preview.sceneManager.scene);
 
     // Vista inicial
-    setCameraView(preview, "isoFL");
+    setCameraView(preview, currentAngle as CameraAngle, currentZoom as Zoom);
 
     const initialImage = await captureCanvas(
         renderer,

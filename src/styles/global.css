@@ -1,0 +1,42 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* fondos */
+    --bg: #f4ecdc;
+    /* fondo base de la página */
+    --bg-elevated: #fbf6ec;
+    --bg-elevated-hover: #ecfbf7;
+    /* cards, plataforma de carga, modales */
+    --bg-sunken: #ece2cd;
+    /* footer, secciones para separar del fondo base */
+
+    /* texto */
+    --ink: #1e2420;
+    /* texto principal */
+    --muted: #6b6154;
+    /* texto secundario, subtítulos */
+    --placeholder: #a89b85;
+    /* texto terciario, placeholders, deshabilitado */
+
+    /* bordes y líneas */
+    --border: #d9cbb0;
+
+    /* acento, ahora en dorado ámbar en vez de naranja */
+    --accent: #c9891f;
+    --accent-dark: #a06c15;
+    /* hover, active */
+    --accent-soft: #f3dda3;
+    /* fondos suaves, badges, íconos */
+
+    --hover: #8299a5;
+
+    /* semánticos, desaturados para que combinen con el resto */
+    --success: #4f7a52;
+    --danger: #b3452c;
+    --warning: #b98a2f;
+    --info: #4c6b7a;
+}

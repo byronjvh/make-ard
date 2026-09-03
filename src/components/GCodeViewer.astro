@@ -1,26 +1,57 @@
 ---
-
+import {
+    ArrowDownToLine,
+    Box,
+    LayersArrowDown,
+    RulerDimensionLine,
+} from "@lucide/astro";
 ---
 
 <div class="gcode-container">
     <div id="upload-wrapper" class="upload-wrapper">
         <div id="upload-area" class="upload-area">
+            <span class="corner tl"></span>
+            <span class="corner tr"></span>
+            <span class="corner br"></span>
+            <span class="corner bl"></span>
             <input id="gcode-file" type="file" accept=".gcode,.gc,.gco" />
-    
-            <label for="gcode-file"> Seleccionar G-code o imagen </label>
-    
-            <p id="file-name">Ningún archivo seleccionado</p>
-    
-            <p class="drop-hint">o arrastra tu archivo aquí</p>
+
+            <label for="gcode-file">
+                <span class="icon-wrapper">
+                    <ArrowDownToLine
+                        class="arrow-icon"
+                        size={24}
+                        stroke-width={2}
+                    />
+                </span>
+                <p class="gcode-text">Suelta tu G-code o imagen aquí</p>
+                <p class="gcode-file-name" id="file-name">
+                    Ningún archivo seleccionado
+                </p>
+                <span class="gcode-line-separator"></span>
+                <p class="drop-hint">o haz clic para buscar en tu equipo</p>
+            </label>
         </div>
-        <div>
-            <p class="upload-text">
-                Carga tu G-code o empieza con una imagen para generar tu Print Card.
-            </p>
+        <div class="decoration-metadata">
             <p>
-                Cargar tu G-code permite generar una vista previa de tu modelo y extraer metadatos como dimensiones, altura de capa, material y más (En los casos compatibles).
+                <RulerDimensionLine
+                    size={20}
+                    class="decoration-metadata-icon"
+                />Dimensiones
+            </p>
+            <p><Box size={20} class="decoration-metadata-icon" />Material</p>
+            <p>
+                <LayersArrowDown
+                    size={20}
+                    class="decoration-metadata-icon"
+                />Altura de capa
             </p>
         </div>
+        <p class="upload-text">
+            Cargar tu G-code, en casos compatibles, permite generar una vista
+            previa de tu modelo y extraer metadatos de impresión. También puedes
+            comenzar con una imagen.
+        </p>
     </div>
 
     <div class="preview-wrapper">
@@ -30,10 +61,16 @@
 
 <script>
     import * as THREE from "three";
-    import { setCameraView, zoomOptions, type CameraAngle, type Zoom } from "../logic/camera";
+    import {
+        setCameraView,
+        zoomOptions,
+        type CameraAngle,
+        type Zoom,
+    } from "../logic/camera";
     import { processGCodeFile } from "../logic/processGCodeFile";
     import { captureCanvas } from "../logic/processGCodeFile";
-import { cameraAnglesOptions } from "../logic/camera";
+    import { cameraAnglesOptions } from "../logic/camera";
+    import { dictionaryModelColorSchemes } from "../logic/themes";
 
     // =========================================================
     // ELEMENTOS
@@ -43,11 +80,16 @@ import { cameraAnglesOptions } from "../logic/camera";
     const canvas = document.querySelector<HTMLCanvasElement>("#gcode-canvas");
     const fileNameElement = document.querySelector<HTMLElement>("#file-name");
     const uploadArea = document.querySelector<HTMLElement>("#upload-area");
-    const uploadWrapper = document.querySelector<HTMLElement>("#upload-wrapper");
+    const uploadWrapper =
+        document.querySelector<HTMLElement>("#upload-wrapper");
     const printCard = document.querySelector<HTMLElement>("#print-card");
     const controls = document.querySelector<HTMLElement>("#controls");
-    const viewSelect = document.querySelector<HTMLElement>("#view-select");
-    const zoomSelect = document.querySelector<HTMLElement>("#zoom-select");
+    const viewSelect =
+        document.querySelector<HTMLSelectElement>("#view-select");
+    const zoomSelect =
+        document.querySelector<HTMLSelectElement>("#zoom-select");
+    const themeSelect =
+        document.querySelector<HTMLSelectElement>("#theme-select");
 
     if (
         !fileInput ||
@@ -58,7 +100,8 @@ import { cameraAnglesOptions } from "../logic/camera";
         !printCard ||
         !controls ||
         !viewSelect ||
-        !zoomSelect
+        !zoomSelect ||
+        !themeSelect
     ) {
         throw new Error("No se encontraron los elementos necesarios");
     }
@@ -78,10 +121,12 @@ import { cameraAnglesOptions } from "../logic/camera";
     let currentImageUrl: string | null = null;
     let currentAngle: CameraAngle = cameraAnglesOptions[0];
     let currentZoom: Zoom = zoomOptions[0];
+    let currentModelColor: string =
+        dictionaryModelColorSchemes["theme-blueprint"];
     // =========================================================
     // DRAG & DROP
     // =========================================================
-    
+
     uploadArea.addEventListener("dragover", (event) => {
         event.preventDefault();
 
@@ -101,10 +146,7 @@ import { cameraAnglesOptions } from "../logic/camera";
 
         if (!droppedFile) return;
 
-        const extension = droppedFile.name
-            .split(".")
-            .pop()
-            ?.toLowerCase();
+        const extension = droppedFile.name.split(".").pop()?.toLowerCase();
 
         if (
             extension !== "gcode" &&
@@ -119,7 +161,7 @@ import { cameraAnglesOptions } from "../logic/camera";
 
         fileNameElement.textContent = file.name;
 
-        const result = await processGCodeFile(file, canvas);
+        const result = await processGCodeFile(file, canvas, currentModelColor);
 
         if (result?.ok) {
             preview = result.preview;
@@ -132,7 +174,7 @@ import { cameraAnglesOptions } from "../logic/camera";
             controls.classList.remove("hide");
         }
     });
-    
+
     // =========================================================
     // CARGAR G-CODE
     // =========================================================
@@ -143,12 +185,7 @@ import { cameraAnglesOptions } from "../logic/camera";
             return;
         }
 
-        const image = await captureCanvas(
-            renderer,
-            scene,
-            camera,
-            canvas,
-        );
+        const image = await captureCanvas(renderer, scene, camera, canvas);
 
         if (!image) return;
 
@@ -176,7 +213,7 @@ import { cameraAnglesOptions } from "../logic/camera";
 
         fileNameElement.textContent = file.name;
 
-        const result = await processGCodeFile(file, canvas);
+        const result = await processGCodeFile(file, canvas, currentModelColor);
         if (result?.ok) {
             preview = result.preview;
             renderer = result.renderer;
@@ -189,7 +226,6 @@ import { cameraAnglesOptions } from "../logic/camera";
         }
     });
 
-    
     viewSelect.addEventListener("change", async (event) => {
         if (!preview) return;
 
@@ -200,15 +236,11 @@ import { cameraAnglesOptions } from "../logic/camera";
 
         currentAngle = selectedValue;
 
-        setCameraView(
-            preview,
-            currentAngle,
-            currentZoom,
-        );
+        setCameraView(preview, currentAngle, currentZoom);
 
         await updatePrintCardImage();
     });
-    
+
     zoomSelect.addEventListener("change", async (event) => {
         if (!preview) return;
 
@@ -219,54 +251,86 @@ import { cameraAnglesOptions } from "../logic/camera";
 
         currentZoom = selectedValue;
 
-        setCameraView(
-            preview,
+        setCameraView(preview, currentAngle, currentZoom);
+
+        await updatePrintCardImage();
+    });
+
+    themeSelect.addEventListener("change", async (event) => {
+        const select = event.currentTarget as HTMLSelectElement;
+        const selectedValue =
+            select.value as keyof typeof dictionaryModelColorSchemes;
+
+        if (!selectedValue) return;
+
+        currentModelColor = dictionaryModelColorSchemes[selectedValue];
+
+        console.log(
+            "Selected theme:",
+            selectedValue,
+            "Model color:",
+            currentModelColor,
+        );
+
+        if (!file) return;
+
+        const result = await processGCodeFile(
+            file,
+            canvas,
+            currentModelColor,
             currentAngle,
             currentZoom,
         );
+
+        if (!result?.ok) return;
+
+        preview = result.preview;
+        renderer = result.renderer;
+        scene = result.scene;
+        camera = result.camera;
 
         await updatePrintCardImage();
     });
 </script>
 
 <style>
-    *{
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
+    * {
         font-family: "Google Sans", sans-serif;
     }
+
     .gcode-container {
-        
     }
 
     .upload-wrapper {
         display: flex;
+        flex-direction: column;
         gap: 16px;
+        max-width: 720px;
+        align-items: center;
     }
 
     .upload-text {
-        font-size: 24px;
-        max-width: 500px;
-        color: #333;
-        text-align: left;
-        padding-block: 16px;
+        font-size: 14px;
+        color: var(--placeholder);
+        text-align: center;
+        max-width: 600px;
     }
 
     .upload-area {
         position: relative;
-        aspect-ratio: 1/1;
+        width: 100%;
+        max-width: 500px;
+        height: 260px;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        padding: 20px
-
         align-items: center;
         text-align: center;
 
-        border: 2px dashed transparent;
-        border-radius: 12px;
+        border-radius: 4px;
         border-color: #8080aa;
+        background-color: var(--bg-elevated);
+        margin-bottom: 32px;
 
         transition:
             border-color 0.15s ease,
@@ -274,37 +338,133 @@ import { cameraAnglesOptions } from "../logic/camera";
     }
 
     .upload-area.drag-over {
-        border-color: #1e90ff;
-        background-color: rgba(30, 144, 255, 0.08);
+        background-color: var(--bg-elevated-hover);
+    }
+
+    .upload-area.drag-over .corner {
+        border-color: var(--hover);
+        /* background-color: rgba(30, 144, 255, 0.08); */
     }
 
     .upload-area .drop-hint {
-        margin-top: 8px;
-
         font-size: 13px;
-        opacity: 0.5;
+        color: var(--placeholder);
     }
 
     .upload-area input[type="file"] {
         display: none;
     }
 
+    .upload-area > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    .upload-area .corner {
+        position: absolute;
+        width: 26px;
+        height: 26px;
+        z-index: 0;
+        border-color: var(--accent-dark);
+        border-style: solid;
+        --border-width: 3px;
+    }
+
+    .corner.tl {
+        border-top-left-radius: inherit;
+        left: 0;
+        top: 0;
+        border-width: var(--border-width) 0px 0px var(--border-width);
+    }
+    .corner.tr {
+        border-top-right-radius: inherit;
+        right: 0;
+        top: 0;
+        border-width: var(--border-width) var(--border-width) 0px 0px;
+    }
+    .corner.bl {
+        border-bottom-left-radius: inherit;
+        left: 0;
+        bottom: 0;
+        border-width: 0px 0px var(--border-width) var(--border-width);
+    }
+    .corner.br {
+        border-bottom-right-radius: inherit;
+        right: 0;
+        bottom: 0;
+        border-width: 0px var(--border-width) var(--border-width) 0px;
+    }
+
     .upload-area label {
-        display: inline-block;
-
-        padding: 0.75rem 1.5rem;
-
-        border-radius: 0.5rem;
-
-        background: transparent;
-        color: #001828;
-
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         cursor: pointer;
-        font-weight: 600;
+        padding: 32px;
+        width: 100%;
+    }
+
+    .icon-wrapper {
+        background-color: var(--accent-soft);
+        aspect-ratio: 1;
+        border-radius: 99999999px;
+        padding: 14px;
+        margin-bottom: 16px;
+    }
+
+    .arrow-icon {
+        color: var(--accent);
+    }
+
+    .gcode-text {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    #file-name {
+        font-size: 14px;
+        color: var(--muted);
+    }
+
+    .gcode-line-separator {
+        width: 100%;
+        height: 2px;
+        background-color: var(--border);
+        margin: 16px 0;
+        opacity: 0.75;
     }
 
     .upload-wrapper.hide {
         display: none;
+    }
+
+    .decoration-metadata {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 500px;
+        padding-inline: 16px;
+        font-size: 14px;
+        color: var(--ink);
+        margin-bottom: 8px;
+    }
+
+    .decoration-metadata p {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .decoration-metadata p {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .decoration-metadata-icon {
+        color: var(--accent-dark);
     }
 
     #gcode-canvas {

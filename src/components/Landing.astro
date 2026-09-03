@@ -11,9 +11,10 @@ import GitHub from "./icons/Github.astro";
 		</a>
 		<nav>
 			<a class="nav-link" href="#">Acerca de</a>
-			<a class="nav-link" href="#"><GitHub />byronjvh</a>
+			<a class="nav-link" href="#"><GitHub size="18" />byronjvh</a>
 		</nav>
 	</header>
+	<span class="landing-top-separator"></span>
 	<h1 class="landing-title">
 		Tu impresora hace la pieza, make-ard hace la ficha
 	</h1>
@@ -42,12 +43,6 @@ import GitHub from "./icons/Github.astro";
 </div>
 
 <style>
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
-
 	header {
 		display: flex;
 		justify-content: space-between;
@@ -59,14 +54,14 @@ import GitHub from "./icons/Github.astro";
 
 	nav {
 		display: flex;
-		gap: 16px;
+		gap: 22px;
 		align-items: center;
 	}
 
 	.nav-link {
 		display: flex;
 		align-items: center;
-		gap: 4px;
+		gap: 8px;
 		font-family: "Google Sans", sans-serif;
 		font-weight: 500;
 		font-size: 16px;
@@ -76,7 +71,7 @@ import GitHub from "./icons/Github.astro";
 
 	.logo-link {
 		text-decoration: none;
-		color: #333;
+		color: var(--ink);
 	}
 
 	.logo {
@@ -95,6 +90,13 @@ import GitHub from "./icons/Github.astro";
 		flex-direction: column;
 	}
 
+	.landing-top-separator {
+		width: 50px;
+		height: 4px;
+		background-color: var(--accent-dark);
+		margin: 64px 0 12px;
+	}
+
 	.printCard-container {
 		width: 100%;
 		max-width: 900px;
@@ -104,21 +106,22 @@ import GitHub from "./icons/Github.astro";
 	.landing-title {
 		font-family: "Ubuntu sans", sans-serif;
 		font-weight: 900;
-		font-size: 40px;
+		font-size: 48px;
 		max-width: 720px;
 		text-align: center;
 		text-wrap: balance;
-		margin-block: 8px;
+		margin-block: 16px;
+		color: var(--ink);
 	}
 
 	.landing-tagline {
-		color: #666;
+		color: var(--muted);
 		font-family: "Google sans", sans-serif;
-		font-size: 20px;
-		max-width: 720px;
+		font-size: 18px;
+		max-width: 680px;
 		text-align: center;
 		text-wrap: pretty;
-		margin-bottom: 28px;
+		margin-bottom: 48px;
 	}
 
 	.controls.hide {
@@ -172,6 +175,7 @@ import GitHub from "./icons/Github.astro";
 	};
 	import { cameraAnglesOptions } from "../logic/camera";
 	import { zoomOptions } from "../logic/camera";
+	import { dictionaryThemes, THEMES } from "../logic/themes";
 	for (const zoom of zoomOptions) {
 		const option = document.createElement("option");
 		option.value = zoom;
@@ -184,22 +188,6 @@ import GitHub from "./icons/Github.astro";
 		option.textContent = dictionaryAngles[angle] || angle;
 		document?.getElementById("view-select")?.appendChild(option);
 	}
-
-	const THEMES = [
-		"theme-blueprint",
-		"theme-carbono",
-		"theme-matcha",
-		"theme-cobre",
-		"theme-neon",
-	] as const;
-
-	const dictionaryThemes = {
-		"theme-blueprint": "Blueprint",
-		"theme-carbono": "Carbono",
-		"theme-matcha": "Matcha",
-		"theme-cobre": "Cobre",
-		"theme-neon": "Neon",
-	};
 
 	for (const theme of THEMES) {
 		const option = document.createElement("option");
