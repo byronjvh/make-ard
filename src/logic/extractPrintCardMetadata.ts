@@ -179,27 +179,77 @@ export function extractPrintCardMetadata(
     // FILAMENTO
     // =====================================================
 
+
+
     const filamentText = findMatch([
-        /;\s*filament\s*used\s*\[g\]\s*=\s*(.+)/i,
-        /;\s*filament[_ ]used\s*[:=]\s*(.+)/i,
-        /;\s*filament[_ ]weight\s*[:=]\s*(.+)/i
+        /;\s*filament[\_ ]used\s*[:=]\s*(.+)/i,
+        /;\s*filament[\_ ]weight\s*[:=]\s*(.+)/i
+    ]);
+
+    const filamentDensity = findNumber([
+        /;\s*filament[\_ ]density\s*[:=]\s*([\d.]+)/i
+    ]);
+
+    const filamentDiameter = findNumber([
+        /;\s*filament[\_ ]diameter\s*[:=]\s*([\d.]+)/i
     ]);
 
     if (filamentText !== undefined) {
-
         const values = filamentText
             .split(",")
-            .map(value => parseFloat(value.trim()))
-            .filter(value => Number.isFinite(value));
+            .map(value => {
+                const match = value.trim().match(
+                    /([\d.]+)\s*(kg|g|mg|m|mm)?/i
+                );
+
+                if (!match) return undefined;
+
+                const amount = parseFloat(match[1]);
+                const unit = match[2]?.toLowerCase() || "g";
+
+                if (!Number.isFinite(amount)) return undefined;
+
+                // Ya está expresado en gramos
+                if (unit === "g") {
+                    return amount;
+                }
+
+                // Kilogramos → gramos
+                if (unit === "kg") {
+                    return amount * 1000;
+                }
+
+                // Miligramos → gramos
+                if (unit === "mg") {
+                    return amount / 1000;
+                }
+
+                // Metros → gramos
+                if (
+                    unit === "m" &&
+                    filamentDensity !== undefined &&
+                    filamentDiameter !== undefined
+                ) {
+                    return filamentLengthToGrams(
+                        amount,
+                        filamentDiameter,
+                        filamentDensity
+                    );
+                }
+
+                return undefined;
+            })
+            .filter(
+                (value): value is number =>
+                    value !== undefined && Number.isFinite(value)
+            );
 
         if (values.length > 0) {
-
             metadata.filamentUsed = {
                 total: values.reduce(
                     (sum, value) => sum + value,
                     0
                 ),
-
                 byColor: values
             };
         }
@@ -261,6 +311,22 @@ export function extractPrintCardMetadata(
         : undefined;
 
     return metadata;
+}
+
+function filamentLengthToGrams(
+    lengthMeters: number,
+    diameterMm: number,
+    density: number
+): number {
+    const lengthMm = lengthMeters * 1000;
+    const radiusMm = diameterMm / 2;
+
+    const volumeMm3 =
+        lengthMm * Math.PI * radiusMm * radiusMm;
+
+    const volumeCm3 = volumeMm3 / 1000;
+
+    return volumeCm3 * density;
 }
 
 function parsePrintTime(

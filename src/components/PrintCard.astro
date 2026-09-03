@@ -132,13 +132,10 @@ import {
         const image = detail.image;
         metadata = detail.metadata;
 
-        if (!metadata) {
-            console.warn("No metadata received");
-            return;
+        if (metadata) {
+            console.log("parsed metadata", formatMetadata(metadata));
+            console.log("metadata", metadata);
         }
-
-        console.log("parsed metadata", formatMetadata(metadata));
-        console.log("metadata", metadata);
 
         const preview = document.querySelector(
             ".print-card-thumbnail",
