@@ -9,7 +9,8 @@ export type CameraAngle =
     | "back"
     | "left"
     | "right"
-    | "top";
+    | "top"
+    | "bottom"
 
 export type Zoom =
     | "Standard"
@@ -26,6 +27,7 @@ export const cameraAnglesOptions = [
     "left",
     "right",
     "top",
+    "bottom"
 ] as const;
 export const zoomOptions = [
     "Standard",
@@ -46,6 +48,7 @@ const CAMERA_DIRECTIONS: Record<
     left: new THREE.Vector3(-1, 0, 0),
     right: new THREE.Vector3(1, 0, 0),
     top: new THREE.Vector3(0, 1, 0),
+    bottom: new THREE.Vector3(0, -1, 0),
 };
 const CAMERA_ZOOM: Record<
     Zoom,

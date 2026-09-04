@@ -5,6 +5,7 @@ import {
     LayersArrowDown,
     RulerDimensionLine,
 } from "@lucide/astro";
+import BenchyLoader from "./BenchyLoader.astro";
 ---
 
 <div class="gcode-container">
@@ -20,9 +21,10 @@ import {
                 <span class="icon-wrapper">
                     <ArrowDownToLine
                         class="arrow-icon"
-                        size={24}
+                        size={28}
                         stroke-width={2}
                     />
+                    <BenchyLoader size="36" class="benchy-loader hide" />
                 </span>
                 <p class="gcode-text">Suelta tu G-code o imagen aquí</p>
                 <p class="gcode-file-name" id="file-name">
@@ -90,6 +92,13 @@ import {
         document.querySelector<HTMLSelectElement>("#zoom-select");
     const themeSelect =
         document.querySelector<HTMLSelectElement>("#theme-select");
+    const arrowIcon = document.querySelector<HTMLElement>(".arrow-icon");
+    const benchyLoader = document.querySelector<HTMLElement>(".benchy-loader");
+
+    const setLoading = (loading: boolean) => {
+        arrowIcon?.classList.toggle("hide", loading);
+        benchyLoader?.classList.toggle("hide", !loading);
+    };
 
     if (
         !fileInput ||
@@ -139,12 +148,15 @@ import {
 
     uploadArea.addEventListener("drop", async (event) => {
         event.preventDefault();
-
+        setLoading(true);
         uploadArea.classList.remove("drag-over");
 
         const droppedFile = event.dataTransfer?.files?.[0];
 
-        if (!droppedFile) return;
+        if (!droppedFile) {
+            setLoading(false);
+            return;
+        }
 
         const extension = droppedFile.name.split(".").pop()?.toLowerCase();
 
@@ -172,6 +184,7 @@ import {
             uploadWrapper.classList.add("hide");
             printCard.classList.remove("hide");
             controls.classList.remove("hide");
+            setLoading(false);
         }
     });
 
@@ -204,12 +217,26 @@ import {
         );
     }
 
+    async function setPrintCardLoading(loading: boolean) {
+        window.dispatchEvent(
+            new CustomEvent("print-card-update", {
+                detail: {
+                    loading: loading,
+                },
+            }),
+        );
+    }
+
     fileInput.addEventListener("change", async (event) => {
         const input = event.currentTarget as HTMLInputElement;
+        setLoading(true);
 
         file = input.files?.[0];
 
-        if (!file) return;
+        if (!file) {
+            setLoading(false);
+            return;
+        }
 
         fileNameElement.textContent = file.name;
 
@@ -223,11 +250,13 @@ import {
             uploadWrapper.classList.add("hide");
             printCard.classList.remove("hide");
             controls.classList.remove("hide");
+            setLoading(false);
         }
     });
 
     viewSelect.addEventListener("change", async (event) => {
         if (!preview) return;
+        setPrintCardLoading(true);
 
         const select = event.currentTarget as HTMLSelectElement;
         const selectedValue = select.value as CameraAngle;
@@ -239,10 +268,12 @@ import {
         setCameraView(preview, currentAngle, currentZoom);
 
         await updatePrintCardImage();
+        setPrintCardLoading(false);
     });
 
     zoomSelect.addEventListener("change", async (event) => {
         if (!preview) return;
+        setPrintCardLoading(true);
 
         const select = event.currentTarget as HTMLSelectElement;
         const selectedValue = select.value as Zoom;
@@ -254,6 +285,7 @@ import {
         setCameraView(preview, currentAngle, currentZoom);
 
         await updatePrintCardImage();
+        setPrintCardLoading(false);
     });
 
     themeSelect.addEventListener("change", async (event) => {
@@ -262,6 +294,7 @@ import {
             select.value as keyof typeof dictionaryModelColorSchemes;
 
         if (!selectedValue) return;
+        setPrintCardLoading(true);
 
         currentModelColor = dictionaryModelColorSchemes[selectedValue];
 
@@ -290,6 +323,7 @@ import {
         camera = result.camera;
 
         await updatePrintCardImage();
+        setPrintCardLoading(false);
     });
 </script>
 
@@ -408,12 +442,31 @@ import {
         background-color: var(--accent-soft);
         aspect-ratio: 1;
         border-radius: 99999999px;
-        padding: 14px;
         margin-bottom: 16px;
+        height: 64px;
+        position: relative;
+        color: var(--accent-dark);
     }
 
     .arrow-icon {
-        color: var(--accent);
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .benchy-loader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .arrow-icon.hide {
+        display: none;
+    }
+
+    .benchy-loader.hide {
+        display: none;
     }
 
     .gcode-text {

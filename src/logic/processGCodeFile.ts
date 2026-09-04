@@ -1,10 +1,11 @@
 import { GCodePreview } from "gcode-preview";
 import { removePurgeLines } from "./GCodeRemovePurgeLines";
 import { cameraAnglesOptions, setCameraView, zoomOptions, type CameraAngle, type Zoom } from "./camera";
-import { extractPrintCardMetadata } from "./extractPrintCardMetadata";
+import { extractPrintCardMetadata, type PrintCardMetadata } from "./extractPrintCardMetadata";
 import { modelCenter } from "./modelCenter";
 import { makeExtrusionsRectangular } from "./makeExtrusionsRectangular";
 import * as THREE from "three";
+import { setPrintCardMetadata } from "./printCardState";
 
 export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, modelColor: string, currentAngle: CameraAngle = cameraAnglesOptions[0], currentZoom: Zoom = zoomOptions[0]) {
 
@@ -136,19 +137,13 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, mo
     );
 
     ok = initialImage ? true : false;
+    let metadata: PrintCardMetadata
 
     if (initialImage) {
+        metadata = extractPrintCardMetadata(gcode, file.name, bounds)
+        setPrintCardMetadata(metadata, initialImage);
         window.dispatchEvent(
-            new CustomEvent("gcode-preview-ready", {
-                detail: {
-                    image: initialImage,
-                    metadata: extractPrintCardMetadata(
-                        gcode,
-                        file.name,
-                        bounds,
-                    ),
-                },
-            }),
+            new CustomEvent("print-card-state-ready"),
         );
     }
 

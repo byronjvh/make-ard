@@ -1,4 +1,5 @@
 ---
+import BenchyLoader from "./BenchyLoader.astro";
 import Nozzle from "./icons/Nozzle.astro";
 import {
     Clock,
@@ -10,15 +11,24 @@ import {
     Box,
     Landmark,
 } from "@lucide/astro";
+
+const { metadata, image, loading } = Astro.props;
 ---
 
 <article id="print-card" class="print-card hide">
     <header>
-        <img
-            class="print-card-thumbnail"
-            src="https://media.printables.com/media/prints/203925/images/1875500_cd7c1d22-dfb1-4c56-8e28-71fd9454dc74/thumbs/inside/1280x960/jpg/7b62dfe39e94e61584a93da27d085074_display_large_20.webp"
-            alt=""
-        />
+        <div class="print-card-thumbnail-wrapper">
+            <img
+                class="print-card-thumbnail"
+                src="https://media.printables.com/media/prints/203925/images/1875500_cd7c1d22-dfb1-4c56-8e28-71fd9454dc74/thumbs/inside/1280x960/jpg/7b62dfe39e94e61584a93da27d085074_display_large_20.webp"
+                alt=""
+            />
+            <BenchyLoader
+                size="52"
+                id="print-card-loader"
+                class="benchy-loader hide"
+            />
+        </div>
         <div class="print-card-header-text">
             <div>
                 <h3>Título de la card</h3>
@@ -122,28 +132,32 @@ import {
 </article>
 
 <script>
-    import { formatMetadata } from "../logic/formatMetadata";
-    import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
-    let metadata: PrintCardMetadata | undefined;
+    // import { formatMetadata } from "../logic/formatMetadata";
+    // import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
+    // let metadata: PrintCardMetadata | undefined;
 
-    window.addEventListener("gcode-preview-ready", (event) => {
-        const detail = (event as CustomEvent).detail;
+    import { printCardState } from "../logic/printCardState";
 
-        const image = detail.image;
-        metadata = detail.metadata;
+    const printCardThumbnail = document.querySelector(".print-card-thumbnail");
+    const benchyLoader = document.querySelector("#print-card-loader");
 
-        if (metadata) {
-            console.log("parsed metadata", formatMetadata(metadata));
-            console.log("metadata", metadata);
-        }
-
-        const preview = document.querySelector(
-            ".print-card-thumbnail",
-        ) as HTMLImageElement;
+    window.addEventListener("print-card-state-ready", () => {
+        const { preview } = printCardState;
 
         if (!preview) return;
+        const image = document.querySelector<HTMLImageElement>(
+            ".print-card-thumbnail",
+        );
+        if (!image) return;
+        image.src = preview;
+    });
 
-        preview.src = image;
+    window.addEventListener("print-card-update", (event) => {
+        const detail = (event as CustomEvent).detail;
+        const loading = detail.loading;
+
+        printCardThumbnail?.classList.toggle("hide", loading);
+        benchyLoader?.classList.toggle("hide", !loading);
     });
 </script>
 
@@ -151,7 +165,7 @@ import {
     .print-card {
         --bg-color: #fff;
         --bg-img: #dfdfff;
-        --model-color: #d200e6;
+        --model-color: #d19a45;
         --border-color: rgba(0, 0, 0, 0.1);
         --font-title: "Montserrat", sans-serif;
         --font-data: "Ubuntu Mono", sans-serif;
@@ -238,14 +252,30 @@ import {
         opacity: 0.5;
     }
 
-    .print-card-thumbnail {
+    .print-card-thumbnail-wrapper {
         width: 160px;
         aspect-ratio: 1/1;
-        object-fit: cover;
         border-radius: 8px;
         background-color: var(--bg-img);
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-
+    .print-card-thumbnail {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+    }
+    .print-card-thumbnail.hide {
+        display: none;
+    }
+    .benchy-loader.hide {
+        display: none;
+    }
+    .benchy-loader {
+        color: var(--model-color);
+        filter: brightness(0.92) contrast(1.2) saturate(1.8) hue-rotate(-5deg);
+    }
     .print-card-list {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -312,7 +342,7 @@ import {
         --font-title: "Montserrat", sans-serif;
         --bg-color: #eef3fb;
         --bg-img: #dbe6fa;
-        --model-color: #f2b134;
+        --model-color: #c8a85a;
         --border-color: rgba(20, 50, 90, 0.15);
         --bg-footer: rgba(20, 50, 90, 0.08);
         --icon-color: #2f6fed;
@@ -328,7 +358,7 @@ import {
         --font-title: "Righteous", sans-serif;
         --bg-color: #1b1e24;
         --bg-img: #2a2e37;
-        --model-color: #c6ff3a;
+        --model-color: #a8c56a;
         --border-color: rgba(255, 255, 255, 0.08);
         --bg-footer: rgba(255, 255, 255, 0.06);
         --icon-color: #ff7a30;
@@ -348,7 +378,7 @@ import {
         --font-title: "Merriweather", serif;
         --bg-color: #f6efe3;
         --bg-img: #ecdec4;
-        --model-color: #4a8c6f;
+        --model-color: #66927d;
         --border-color: rgba(120, 80, 40, 0.15);
         --bg-footer: rgba(120, 80, 40, 0.1);
         --icon-color: #b5651d;
@@ -364,7 +394,7 @@ import {
         --font-title: "Great Vibes", cursive;
         --bg-color: #eef3ea;
         --bg-img: #dbe6d3;
-        --model-color: #e78ba0;
+        --model-color: #c995a2;
         --border-color: rgba(60, 100, 50, 0.15);
         --bg-footer: rgba(60, 100, 50, 0.08);
         --icon-color: #4c7a3f;
@@ -380,7 +410,7 @@ import {
         --font-title: "Goldman", sans-serif;
         --bg-color: #0d0f1a;
         --bg-img: #1a1d2e;
-        --model-color: #f9ff33;
+        --model-color: #c7cc63;
         --border-color: rgba(255, 255, 255, 0.08);
         --bg-footer: rgba(255, 255, 255, 0.05);
         --icon-color: #37e6e6;

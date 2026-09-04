@@ -16,14 +16,14 @@ export const dictionaryThemes = {
 
 export const dictionaryModelColorSchemes = {
 
-    "theme-blueprint": "#d6a94a",
+    "theme-blueprint": "#c8a85a",
 
-    "theme-carbono": "#a9d45a",
+    "theme-carbono": "#a8c56a",
 
-    "theme-matcha": "#d4939f",
+    "theme-matcha": "#c995a2",
 
-    "theme-cobre": "#60907c",
+    "theme-cobre": "#66927d",
 
-    "theme-neon": "#d9dc58",
+    "theme-neon": "#c7cc63",
 
 };

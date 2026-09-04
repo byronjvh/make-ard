@@ -1,7 +1,7 @@
 ---
 import GCodeViewer from "./GCodeViewer.astro";
 import PrintCard from "./PrintCard.astro";
-import GitHub from "./icons/Github.astro";
+import GitHub from "./icons/GitHub.astro";
 ---
 
 <div id="container">
@@ -25,6 +25,50 @@ import GitHub from "./icons/Github.astro";
 	<GCodeViewer />
 	<section class="printCard-container">
 		<PrintCard />
+		<form action="">
+			<div>
+				<div>
+					<label for="">Print Time</label>
+					<input type="number" />
+				</div>
+				<div>
+					<label for="">Filament Used</label>
+					<input type="text" />
+				</div>
+				<div>
+					<label for="">Dimensions</label>
+					<input type="text" />
+				</div>
+			</div>
+			<div>
+				<div>
+					<label for="">Layer Height</label>
+					<input type="number" />
+				</div>
+				<div>
+					<label for="">Infill</label>
+					<input type="text" />
+				</div>
+				<div>
+					<label for="">Walls</label>
+					<input type="text" />
+				</div>
+			</div>
+			<div>
+				<div>
+					<label for="">Material</label>
+					<input type="number" />
+				</div>
+				<div>
+					<label for="">Nozzle</label>
+					<input type="text" />
+				</div>
+				<div>
+					<label for="">Supports</label>
+					<input type="text" />
+				</div>
+			</div>
+		</form>
 	</section>
 	<div id="controls" class="controls hide">
 		<div class="selec-wrapper">
@@ -162,6 +206,9 @@ import GitHub from "./icons/Github.astro";
 </style>
 
 <script>
+	import { formatMetadata } from "../logic/formatMetadata";
+	import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
+
 	const dictionaryAngles = {
 		isoFL: "Isometric FL",
 		isoFR: "Isometric FR",
@@ -172,10 +219,12 @@ import GitHub from "./icons/Github.astro";
 		left: "Left",
 		right: "Right",
 		back: "Back",
+		bottom: "Bottom",
 	};
 	import { cameraAnglesOptions } from "../logic/camera";
 	import { zoomOptions } from "../logic/camera";
 	import { dictionaryThemes, THEMES } from "../logic/themes";
+	import { printCardState } from "../logic/printCardState";
 	for (const zoom of zoomOptions) {
 		const option = document.createElement("option");
 		option.value = zoom;
@@ -204,4 +253,12 @@ import GitHub from "./icons/Github.astro";
 				printCard.classList.add(selectedTheme);
 			});
 	}
+
+	window.addEventListener("print-card-state-ready", () => {
+		const { printCardMetadata } = printCardState;
+
+		if (!printCardMetadata) return;
+
+		console.log(printCardMetadata);
+	});
 </script>
