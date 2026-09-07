@@ -179,59 +179,149 @@ export function extractPrintCardMetadata(
     // FILAMENTO
     // =====================================================
 
+    let filamentText: string | undefined;
+    let filamentUnit: string | undefined;
 
+    // -----------------------------------------------------
+    // Formato moderno:
+    // ; filament used [g] = 14.42, 0.00, 0.00, 0.00
+    // ; filament used [m] = 4.834, 0.00, 0.00, 0.00
+    // -----------------------------------------------------
 
-    const filamentText = findMatch([
-        /;\s*filament[\_ ]used\s*[:=]\s*(.+)/i,
-        /;\s*filament[\_ ]weight\s*[:=]\s*(.+)/i
-    ]);
+    for (const line of lines) {
+        const match = line.match(
+            /;\s*filament\s*used\s*\[(kg|g|mg|m|mm)\]\s*[:=]\s*(.+)/i
+        );
+
+        if (match) {
+            filamentUnit = match[1].toLowerCase();
+            filamentText = match[2].trim();
+            break;
+        }
+    }
+
+    // -----------------------------------------------------
+    // Formatos anteriores:
+    // ; filament used = 14.42g
+    // ; filament used: 14.42 g
+    // ; filament weight = 14.42g
+    // -----------------------------------------------------
+
+    if (filamentText === undefined) {
+        const oldMatch = findMatch([
+            /;\s*filament[\s_]+used\s*[:=]\s*(.+)/i,
+            /;\s*filament[\s_]+weight\s*[:=]\s*(.+)/i,
+        ]);
+
+        if (oldMatch !== undefined) {
+            filamentText = oldMatch;
+        }
+    }
+
+    // -----------------------------------------------------
+    // DENSIDAD
+    // -----------------------------------------------------
 
     const filamentDensity = findNumber([
-        /;\s*filament[\_ ]density\s*[:=]\s*([\d.]+)/i
+        /;\s*filament[\s_]+density\s*[:=]\s*([\d.]+)/i
     ]);
+
+    // -----------------------------------------------------
+    // DIÁMETRO
+    // -----------------------------------------------------
 
     const filamentDiameter = findNumber([
-        /;\s*filament[\_ ]diameter\s*[:=]\s*([\d.]+)/i
+        /;\s*filament[\s_]+diameter\s*[:=]\s*([\d.]+)/i
     ]);
 
+    // -----------------------------------------------------
+    // CONVERSIÓN
+    // -----------------------------------------------------
+
     if (filamentText !== undefined) {
+
         const values = filamentText
             .split(",")
             .map(value => {
-                const match = value.trim().match(
+
+                const text = value.trim();
+
+                const match = text.match(
                     /([\d.]+)\s*(kg|g|mg|m|mm)?/i
                 );
 
                 if (!match) return undefined;
 
                 const amount = parseFloat(match[1]);
-                const unit = match[2]?.toLowerCase() || "g";
 
-                if (!Number.isFinite(amount)) return undefined;
+                if (!Number.isFinite(amount)) {
+                    return undefined;
+                }
 
-                // Ya está expresado en gramos
+                // Si el formato moderno especificó una unidad,
+                // usamos esa unidad para todos los valores.
+                const unit =
+                    filamentUnit ||
+                    match[2]?.toLowerCase() ||
+                    "g";
+
+                // -------------------------------------------------
+                // GRAMOS
+                // -------------------------------------------------
+
                 if (unit === "g") {
                     return amount;
                 }
 
-                // Kilogramos → gramos
+                // -------------------------------------------------
+                // KILOGRAMOS
+                // -------------------------------------------------
+
                 if (unit === "kg") {
                     return amount * 1000;
                 }
 
-                // Miligramos → gramos
+                // -------------------------------------------------
+                // MILIGRAMOS
+                // -------------------------------------------------
+
                 if (unit === "mg") {
                     return amount / 1000;
                 }
 
-                // Metros → gramos
-                if (
-                    unit === "m" &&
-                    filamentDensity !== undefined &&
-                    filamentDiameter !== undefined
-                ) {
+                // -------------------------------------------------
+                // METROS
+                // -------------------------------------------------
+
+                if (unit === "m") {
+
+                    if (
+                        filamentDensity === undefined ||
+                        filamentDiameter === undefined
+                    ) {
+                        return undefined;
+                    }
+
                     return filamentLengthToGrams(
                         amount,
+                        filamentDiameter,
+                        filamentDensity
+                    );
+                }
+
+                // mm no se puede convertir sin asumir
+                // que el valor representa longitud de filamento.
+                if (unit === "mm") {
+
+                    if (
+                        filamentDensity === undefined ||
+                        filamentDiameter === undefined
+                    ) {
+                        return undefined;
+                    }
+
+                    return filamentLengthToGrams(
+                        amount / 1000,
                         filamentDiameter,
                         filamentDensity
                     );
@@ -241,20 +331,24 @@ export function extractPrintCardMetadata(
             })
             .filter(
                 (value): value is number =>
-                    value !== undefined && Number.isFinite(value)
+                    value !== undefined &&
+                    Number.isFinite(value)
             );
 
         if (values.length > 0) {
+            const total = values.reduce(
+                (sum, value) => sum + value,
+                0
+            );
+
             metadata.filamentUsed = {
-                total: values.reduce(
-                    (sum, value) => sum + value,
-                    0
-                ),
-                byColor: values
+                total: Math.round(total * 100) / 100,
+                byColor: values.map(
+                    value => Math.round(value * 100) / 100
+                )
             };
         }
     }
-
 
     // =====================================================
     // TIEMPO

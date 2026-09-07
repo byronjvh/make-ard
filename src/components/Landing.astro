@@ -23,67 +23,99 @@ import GitHub from "./icons/GitHub.astro";
 		compártelas donde quieras
 	</p>
 	<GCodeViewer />
-	<section class="printCard-container">
-		<PrintCard />
-		<form action="">
-			<div>
-				<div>
+	<section class="printCard-container hide">
+		<div>
+			<div class="printCard-area">
+				<PrintCard />
+			</div>
+			<div id="controls" class="controls">
+				<div class="selec-wrapper">
+					<label for="view-select">Vista</label>
+					<select name="view" id="view-select"> </select>
+				</div>
+				<div class="selec-wrapper">
+					<label for="zoom-select">Zoom</label>
+					<select name="zoom" id="zoom-select"> </select>
+				</div>
+				<div class="selec-wrapper">
+					<label for="theme-select">Tema</label>
+					<select name="theme" id="theme-select"> </select>
+				</div>
+				<div class="selec-wrapper">
+					<label for="shadow-input">Shadow</label>
+					<input
+						type="checkbox"
+						checked
+						name="shadow"
+						id="shadow-input"
+					/>
+				</div>
+				<div class="selec-wrapper">
+					<label for="border-select">Border</label>
+					<input type="checkbox" name="border" id="border-input" />
+				</div>
+			</div>
+		</div>
+		<form class="printCard-form" action="">
+			<span class="corner tl"></span>
+			<span class="corner br"></span>
+			<h3>DATOS DEL MODELO</h3>
+			<div class="printCard-form-field">
+				<label for="">Nombre del modelo</label>
+				<input type="text" placeholder="Ej. Dinosaurio 3D" />
+			</div>
+			<div class="printCard-form-field">
+				<label for="">Descripción del modelo</label>
+				<input
+					type="text"
+					placeholder="Ej. Juguete infantil de dinosaurio, impreso en 3D"
+				/>
+			</div>
+			<div class="printCard-form-row">
+				<div class="printCard-form-field">
 					<label for="">Print Time</label>
-					<input type="number" />
+					<input type="text" placeholder="1h 45m" />
 				</div>
-				<div>
+				<div class="printCard-form-field">
 					<label for="">Filament Used</label>
-					<input type="text" />
+					<input type="text" placeholder="90g" />
 				</div>
-				<div>
+				<div class="printCard-form-field">
 					<label for="">Dimensions</label>
-					<input type="text" />
+					<input type="text" placeholder="120x90x180 mm" />
 				</div>
 			</div>
-			<div>
-				<div>
+			<div class="printCard-form-row">
+				<div class="printCard-form-field">
 					<label for="">Layer Height</label>
-					<input type="number" />
+					<input type="text" placeholder="0.20 mm" />
 				</div>
-				<div>
+				<div class="printCard-form-field">
 					<label for="">Infill</label>
-					<input type="text" />
+					<input type="text" placeholder="15%" />
 				</div>
-				<div>
+				<div class="printCard-form-field">
 					<label for="">Walls</label>
-					<input type="text" />
+					<input type="text" placeholder="3" />
 				</div>
 			</div>
-			<div>
-				<div>
+			<div class="printCard-form-row">
+				<div class="printCard-form-field">
 					<label for="">Material</label>
-					<input type="number" />
+					<input type="text" placeholder="PLA" />
 				</div>
-				<div>
+				<div class="printCard-form-field">
 					<label for="">Nozzle</label>
-					<input type="text" />
+					<input type="text" placeholder="0.4 mm" />
 				</div>
-				<div>
+				<div class="printCard-form-field">
 					<label for="">Supports</label>
-					<input type="text" />
+					<input type="text" placeholder="Yes" />
 				</div>
 			</div>
+			<button>Descargar Print Card</button>
 		</form>
 	</section>
-	<div id="controls" class="controls hide">
-		<div class="selec-wrapper">
-			<label for="view-select">Vista</label>
-			<select name="view" id="view-select"> </select>
-		</div>
-		<div class="selec-wrapper">
-			<label for="zoom-select">Zoom</label>
-			<select name="zoom" id="zoom-select"> </select>
-		</div>
-		<div class="selec-wrapper">
-			<label for="theme-select">Tema</label>
-			<select name="theme" id="theme-select"> </select>
-		</div>
-	</div>
 </div>
 
 <style>
@@ -143,8 +175,9 @@ import GitHub from "./icons/GitHub.astro";
 
 	.printCard-container {
 		width: 100%;
-		max-width: 900px;
+		max-width: 1000px;
 		display: flex;
+		gap: 16px;
 	}
 
 	.landing-title {
@@ -168,16 +201,13 @@ import GitHub from "./icons/GitHub.astro";
 		margin-bottom: 48px;
 	}
 
-	.controls.hide {
-		display: none;
-	}
-
 	.controls {
 		width: 100%;
-		max-width: 900px;
+		max-width: 1000px;
 		display: flex;
-		gap: 16px;
+		gap: 12px;
 		margin-top: 8px;
+		flex-wrap: wrap;
 	}
 
 	.selec-wrapper {
@@ -188,13 +218,13 @@ import GitHub from "./icons/GitHub.astro";
 	/* un estilo muy bonito para los selectores y las options */
 	.selec-wrapper label {
 		font-family: "Google Sans", sans-serif;
-		font-size: 16px;
+		font-size: 14px;
 		font-weight: 500;
 		color: #333;
 	}
 
 	.selec-wrapper select {
-		padding: 4px 8px;
+		padding: 4px 4px;
 		border-radius: 4px;
 		border: 1px solid #ccc;
 		font-family: "Google Sans", sans-serif;
@@ -202,6 +232,102 @@ import GitHub from "./icons/GitHub.astro";
 		font-weight: 500;
 		background-color: #fff;
 		color: #333;
+	}
+
+	.printCard-area {
+		background-color: var(--bg-elevated);
+		border-radius: 6px;
+		width: calc(
+			var(--card-width) * var(--card-scale) + var(--wrapper-padding) * 2
+		);
+
+		height: calc(
+			var(--card-height) * var(--card-scale) + var(--wrapper-padding) * 2
+		);
+
+		padding: var(--wrapper-padding);
+	}
+
+	.printCard-form {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		background-color: var(--bg-elevated);
+		padding: 20px;
+		border-radius: 6px;
+	}
+	.printCard-form button {
+		border: none;
+		border-radius: 8px;
+		padding: 10px;
+		font-weight: 700;
+		color: #fff;
+		background-color: var(--accent);
+		font-family: "Google sans", sans-serif;
+		cursor: pointer;
+	}
+	.printCard-form h3 {
+		font-size: 14px;
+		font-family: "Ubuntu sans", sans-serif;
+		color: var(--accent-dark);
+	}
+
+	.printCard-form-field {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		font-size: "Google sans", sans-serif;
+	}
+	.printCard-form-field label {
+		color: var(--muted);
+		font-size: 14px;
+	}
+
+	.printCard-form-field input {
+		border-radius: 8px;
+		border: 1px solid var(--placeholder);
+		font-size: 13px;
+		padding: 8px;
+		width: 100%;
+	}
+
+	.printCard-form-row {
+		display: flex;
+		gap: 16px;
+	}
+
+	.printCard-form > * {
+		position: relative;
+		z-index: 1;
+	}
+
+	.printCard-form .corner {
+		position: absolute;
+		width: 26px;
+		height: 26px;
+		z-index: 0;
+		border-color: var(--accent-dark);
+		border-style: solid;
+		--border-width: 3px;
+	}
+
+	.printCard-form .corner.tl {
+		border-top-left-radius: inherit;
+		left: 0;
+		top: 0;
+		border-width: var(--border-width) 0px 0px var(--border-width);
+	}
+
+	.printCard-form .corner.br {
+		border-bottom-right-radius: inherit;
+		right: 0;
+		bottom: 0;
+		border-width: 0px var(--border-width) var(--border-width) 0px;
+	}
+
+	.printCard-container.hide {
+		display: none;
 	}
 </style>
 
@@ -225,6 +351,7 @@ import GitHub from "./icons/GitHub.astro";
 	import { zoomOptions } from "../logic/camera";
 	import { dictionaryThemes, THEMES } from "../logic/themes";
 	import { printCardState } from "../logic/printCardState";
+	const printCard = document.getElementById("printCard");
 	for (const zoom of zoomOptions) {
 		const option = document.createElement("option");
 		option.value = zoom;
@@ -247,7 +374,6 @@ import GitHub from "./icons/GitHub.astro";
 			?.getElementById("theme-select")
 			?.addEventListener("change", (event) => {
 				const selectedTheme = (event.target as HTMLSelectElement).value;
-				const printCard = document.getElementById("print-card");
 				if (!printCard) return;
 				printCard.classList.remove(...THEMES);
 				printCard.classList.add(selectedTheme);
@@ -260,5 +386,28 @@ import GitHub from "./icons/GitHub.astro";
 		if (!printCardMetadata) return;
 
 		console.log(printCardMetadata);
+	});
+
+	const shadowInput = document.getElementById(
+		"shadow-input",
+	) as HTMLInputElement;
+
+	const borderInput = document.getElementById(
+		"border-input",
+	) as HTMLInputElement;
+
+	shadowInput.addEventListener("change", () => {
+		if (shadowInput.checked) {
+			printCard?.classList.add("shadow");
+		} else {
+			printCard?.classList.remove("shadow");
+		}
+	});
+	borderInput.addEventListener("change", () => {
+		if (borderInput.checked) {
+			printCard?.classList.add("border");
+		} else {
+			printCard?.classList.remove("border");
+		}
 	});
 </script>

@@ -15,29 +15,29 @@ import {
 const { metadata, image, loading } = Astro.props;
 ---
 
-<article id="print-card" class="print-card hide">
+<article id="printCard" class="printCard shadow">
     <header>
-        <div class="print-card-thumbnail-wrapper">
+        <div class="printCard-thumbnail-wrapper">
             <img
-                class="print-card-thumbnail"
+                class="printCard-thumbnail"
                 src="https://media.printables.com/media/prints/203925/images/1875500_cd7c1d22-dfb1-4c56-8e28-71fd9454dc74/thumbs/inside/1280x960/jpg/7b62dfe39e94e61584a93da27d085074_display_large_20.webp"
                 alt=""
             />
             <BenchyLoader
                 size="52"
-                id="print-card-loader"
+                id="printCard-loader"
                 class="benchy-loader hide"
             />
         </div>
-        <div class="print-card-header-text">
+        <div class="printCard-header-text">
             <div>
                 <h3>Título de la card</h3>
-                <p class="print-card-description">
+                <p class="printCard-description">
                     Esto es una descripción corta del modelo
                 </p>
             </div>
-            <div class="print-card-header-info">
-                <div>
+            <div class="printCard-header-info">
+                <div data-field="printTime">
                     <span>
                         <Clock
                             class="icon-header"
@@ -49,7 +49,7 @@ const { metadata, image, loading } = Astro.props;
                     <p>2h 34m</p>
                 </div>
                 <!-- <span class="separator"></span> -->
-                <div>
+                <div data-field="filamentUsed">
                     <span>
                         <Spool
                             class="icon-header"
@@ -62,7 +62,7 @@ const { metadata, image, loading } = Astro.props;
                     <p>24.6 g</p>
                 </div>
                 <!-- <span class="separator"></span> -->
-                <div>
+                <div data-field="dimensions">
                     <span>
                         <RulerDimensionLine
                             class="icon-header"
@@ -77,79 +77,84 @@ const { metadata, image, loading } = Astro.props;
         </div>
     </header>
     <span class="separator-horizontal"></span>
-    <ul class="print-card-list">
-        <li class="print-card-list-item">
+    <ul class="printCard-list">
+        <li class="printCard-list-item">
             <LayersArrowDown class="icon-data" size={26} stroke-width={1.5} />
-            <div>
+            <div data-field="layerHeight">
                 <h4>Layer Height</h4>
                 <span> 0.20 mm </span>
             </div>
         </li>
-        <li class="print-card-list-item">
+        <li class="printCard-list-item">
             <WavesHorizontal
                 class="icon-border icon-data"
                 size={22}
                 stroke-width={2}
             />
-            <div>
+            <div data-field="infill">
                 <h4>Infill</h4>
                 <span> 15% Gyroid </span>
             </div>
         </li>
-        <li class="print-card-list-item">
+        <li class="printCard-list-item">
             <BrickWall class="icon-data" stroke-width={1.5} size={26} />
-            <div>
+            <div data-field="walls">
                 <h4>Walls</h4>
                 <span> 3 walls </span>
             </div>
         </li>
-        <li class="print-card-list-item">
+        <li class="printCard-list-item">
             <Box class="icon-data" size={26} stroke-width={1.5} />
-            <div>
+            <div data-field="material">
                 <h4>Material</h4>
                 <span> PLA </span>
             </div>
         </li>
-        <li class="print-card-list-item">
+        <li class="printCard-list-item">
             <Nozzle class="icon-data" size={22} stroke-width={1.5} />
-            <div>
+            <div data-field="nozzleDiameter">
                 <h4>Nozzle</h4>
                 <span> 0.4 mm </span>
             </div>
         </li>
-        <li class="print-card-list-item">
+        <li class="printCard-list-item">
             <Landmark class="icon-data" size={26} stroke-width={1.5} />
-            <div>
+            <div data-field="supports">
                 <h4>Supports</h4>
                 <span> No </span>
             </div>
         </li>
     </ul>
-    <footer class="print-card-footer">
-        <p class="print-card-printer">Flashforge AD5X</p>
+    <footer class="printCard-footer">
+        <p class="printCard-printer">Flashforge AD5X</p>
         <p class="signature">Made by @byronjvh</p>
     </footer>
 </article>
 
 <script>
-    // import { formatMetadata } from "../logic/formatMetadata";
-    // import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
-    // let metadata: PrintCardMetadata | undefined;
+    import {
+        formatMetadata,
+        type FormattedPrintCardMetadata,
+    } from "../logic/formatMetadata";
 
+    import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
     import { printCardState } from "../logic/printCardState";
 
-    const printCardThumbnail = document.querySelector(".print-card-thumbnail");
-    const benchyLoader = document.querySelector("#print-card-loader");
+    const printCardThumbnail = document.querySelector(".printCard-thumbnail");
+    const benchyLoader = document.querySelector("#printCard-loader");
+    const printCard = document.querySelector(".printCard");
 
     window.addEventListener("print-card-state-ready", () => {
-        const { preview } = printCardState;
+        const { preview, printCardMetadata } = printCardState;
 
-        if (!preview) return;
+        if (!preview || !printCardMetadata) return;
+
         const image = document.querySelector<HTMLImageElement>(
-            ".print-card-thumbnail",
+            ".printCard-thumbnail",
         );
         if (!image) return;
         image.src = preview;
+        updatePrintCard(formatMetadata(printCardMetadata));
     });
 
     window.addEventListener("print-card-update", (event) => {
@@ -159,10 +164,31 @@ const { metadata, image, loading } = Astro.props;
         printCardThumbnail?.classList.toggle("hide", loading);
         benchyLoader?.classList.toggle("hide", !loading);
     });
+
+    function updatePrintCard(metadata: FormattedPrintCardMetadata) {
+        if (!printCard) return;
+
+        const fields = printCard.querySelectorAll<HTMLElement>("[data-field]");
+
+        fields.forEach((field) => {
+            const fieldName = field.dataset.field;
+
+            if (!fieldName) return;
+
+            const key = fieldName as keyof FormattedPrintCardMetadata;
+            const value = metadata[key];
+
+            const valueElement = field.querySelector("p");
+
+            if (!valueElement) return;
+
+            valueElement.textContent = String(value ?? "");
+        });
+    }
 </script>
 
 <style>
-    .print-card {
+    .printCard {
         --bg-color: #fff;
         --bg-img: #dfdfff;
         --model-color: #d19a45;
@@ -177,35 +203,39 @@ const { metadata, image, loading } = Astro.props;
         --description-color: #445;
         --data-color: #112;
         --subtitle-color: #667;
+        --shadow: 0 10px 10px 6px rgba(0, 0, 0, 0.05);
+        --border: 2px solid var(--icon-color-2);
 
-        width: 100%;
-        max-width: 560px;
-        aspect-ratio: 1600/1200;
+        width: var(--card-width);
+        height: var(--card-height);
+
+        transform: scale(var(--card-scale));
+        transform-origin: top left;
         background-color: var(--bg-color);
         padding: 22px;
         display: flex;
         flex-direction: column;
         border-radius: 16px;
-        box-shadow: 0 10px 10px 6px rgba(0, 0, 0, 0.05);
         gap: 20px;
         font-family: var(--font-default);
+        border: 2px solid transparent;
     }
 
-    .print-card header {
+    .printCard header {
         display: flex;
         gap: 20px;
         height: 160px;
         max-height: 160px;
     }
 
-    .print-card-header-text {
+    .printCard-header-text {
         display: flex;
         flex-direction: column;
         gap: 20px;
         color: var(--description-color);
     }
 
-    .print-card h3 {
+    .printCard h3 {
         padding-top: 8px;
         height: 42px;
         font-size: 28px;
@@ -215,7 +245,7 @@ const { metadata, image, loading } = Astro.props;
         font-family: var(--font-title);
     }
 
-    .print-card-header-info {
+    .printCard-header-info {
         display: flex;
         gap: 28px;
         height: 100%;
@@ -225,14 +255,14 @@ const { metadata, image, loading } = Astro.props;
         color: var(--data-color);
     }
 
-    .print-card-header-info h4 {
+    .printCard-header-info h4 {
         font-family: var(--font-default);
         text-transform: uppercase;
         font-size: 11px;
         color: var(--subtitle-color);
     }
 
-    .print-card-header-info .separator {
+    .printCard-header-info .separator {
         width: 2px;
         height: 100%;
         background-color: var(--border-color);
@@ -246,13 +276,13 @@ const { metadata, image, loading } = Astro.props;
         background-color: var(--border-color);
     }
 
-    .print-card-description {
+    .printCard-description {
         font-size: 14px;
         font-weight: 600;
         opacity: 0.5;
     }
 
-    .print-card-thumbnail-wrapper {
+    .printCard-thumbnail-wrapper {
         width: 160px;
         aspect-ratio: 1/1;
         border-radius: 8px;
@@ -261,12 +291,12 @@ const { metadata, image, loading } = Astro.props;
         justify-content: center;
         align-items: center;
     }
-    .print-card-thumbnail {
+    .printCard-thumbnail {
         object-fit: cover;
         width: 100%;
         height: 100%;
     }
-    .print-card-thumbnail.hide {
+    .printCard-thumbnail.hide {
         display: none;
     }
     .benchy-loader.hide {
@@ -276,7 +306,7 @@ const { metadata, image, loading } = Astro.props;
         color: var(--model-color);
         filter: brightness(0.92) contrast(1.2) saturate(1.8) hue-rotate(-5deg);
     }
-    .print-card-list {
+    .printCard-list {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 8px;
@@ -286,7 +316,7 @@ const { metadata, image, loading } = Astro.props;
         font-size: 18px;
     }
 
-    .print-card-list-item {
+    .printCard-list-item {
         display: flex;
         gap: 8px;
         height: 50px;
@@ -299,7 +329,7 @@ const { metadata, image, loading } = Astro.props;
         color: var(--data-color);
     }
 
-    .print-card-list-item h4 {
+    .printCard-list-item h4 {
         color: var(--subtitle-color);
         font-family: "Google sans";
         text-transform: uppercase;
@@ -311,7 +341,7 @@ const { metadata, image, loading } = Astro.props;
         border-radius: 4px;
     }
 
-    .print-card-footer {
+    .printCard-footer {
         padding: 12px;
         border-radius: 10px;
         background-color: var(--bg-footer);
@@ -327,7 +357,7 @@ const { metadata, image, loading } = Astro.props;
         color: var(--icon-color-2);
     }
 
-    .print-card-printer {
+    .printCard-printer {
         font-weight: 600;
         color: var(--description-color);
     }
@@ -338,7 +368,7 @@ const { metadata, image, loading } = Astro.props;
     }
 
     /* 1. Blueprint */
-    .print-card.theme-blueprint {
+    .printCard.theme-blueprint {
         --font-title: "Montserrat", sans-serif;
         --bg-color: #eef3fb;
         --bg-img: #dbe6fa;
@@ -354,7 +384,7 @@ const { metadata, image, loading } = Astro.props;
     }
 
     /* 2. Carbono */
-    .print-card.theme-carbono {
+    .printCard.theme-carbono {
         --font-title: "Righteous", sans-serif;
         --bg-color: #1b1e24;
         --bg-img: #2a2e37;
@@ -369,12 +399,12 @@ const { metadata, image, loading } = Astro.props;
         --subtitle-color: #8a8e98;
     }
 
-    .print-card.theme-carbono h3 {
+    .printCard.theme-carbono h3 {
         letter-spacing: 2px;
     }
 
     /* 3. Cobre */
-    .print-card.theme-cobre {
+    .printCard.theme-cobre {
         --font-title: "Merriweather", serif;
         --bg-color: #f6efe3;
         --bg-img: #ecdec4;
@@ -390,7 +420,7 @@ const { metadata, image, loading } = Astro.props;
     }
 
     /* 4. Matcha */
-    .print-card.theme-matcha {
+    .printCard.theme-matcha {
         --font-title: "Great Vibes", cursive;
         --bg-color: #eef3ea;
         --bg-img: #dbe6d3;
@@ -406,7 +436,7 @@ const { metadata, image, loading } = Astro.props;
     }
 
     /* 5. Neón */
-    .print-card.theme-neon {
+    .printCard.theme-neon {
         --font-title: "Goldman", sans-serif;
         --bg-color: #0d0f1a;
         --bg-img: #1a1d2e;
@@ -421,7 +451,11 @@ const { metadata, image, loading } = Astro.props;
         --subtitle-color: #718aa3;
     }
 
-    .print-card.hide {
-        display: none;
+    .printCard.shadow {
+        box-shadow: var(--shadow);
+    }
+
+    .printCard.border {
+        border: var(--border);
     }
 </style>

@@ -85,8 +85,9 @@ import BenchyLoader from "./BenchyLoader.astro";
     const uploadArea = document.querySelector<HTMLElement>("#upload-area");
     const uploadWrapper =
         document.querySelector<HTMLElement>("#upload-wrapper");
-    const printCard = document.querySelector<HTMLElement>("#print-card");
-    const controls = document.querySelector<HTMLElement>("#controls");
+    const printCardContainer = document.querySelector<HTMLElement>(
+        ".printCard-container",
+    );
     const viewSelect =
         document.querySelector<HTMLSelectElement>("#view-select");
     const zoomSelect =
@@ -107,8 +108,7 @@ import BenchyLoader from "./BenchyLoader.astro";
         !fileNameElement ||
         !uploadArea ||
         !uploadWrapper ||
-        !printCard ||
-        !controls ||
+        !printCardContainer ||
         !viewSelect ||
         !zoomSelect ||
         !themeSelect
@@ -183,8 +183,7 @@ import BenchyLoader from "./BenchyLoader.astro";
             camera = result.camera;
 
             uploadWrapper.classList.add("hide");
-            printCard.classList.remove("hide");
-            controls.classList.remove("hide");
+            printCardContainer.classList.remove("hide");
             setLoading(false);
         }
     });
@@ -247,8 +246,7 @@ import BenchyLoader from "./BenchyLoader.astro";
             camera = result.camera;
 
             uploadWrapper.classList.add("hide");
-            printCard.classList.remove("hide");
-            controls.classList.remove("hide");
+            printCardContainer.classList.remove("hide");
             setLoading(false);
         }
     });
@@ -360,7 +358,7 @@ import BenchyLoader from "./BenchyLoader.astro";
         align-items: center;
         text-align: center;
 
-        border-radius: 4px;
+        border-radius: 6px;
         border-color: #8080aa;
         background-color: var(--bg-elevated);
         margin-bottom: 32px;

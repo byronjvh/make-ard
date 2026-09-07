@@ -39,4 +39,9 @@
     --danger: #b3452c;
     --warning: #b98a2f;
     --info: #4c6b7a;
+
+    --card-width: 562px;
+    --card-height: 420px;
+    --card-scale: 0.9;
+    --wrapper-padding: 20px;
 }
