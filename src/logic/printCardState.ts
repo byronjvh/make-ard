@@ -11,10 +11,15 @@ export const printCardState: PrintCardState = {
     preview: undefined,
 };
 
-export function setPrintCardMetadata(
+export function setPrintCardState(
     metadata: PrintCardMetadata,
     image: string,
 ) {
     printCardState.printCardMetadata = metadata;
+    printCardState.preview = image;
+}
+export function setPrintCardPreview(
+    image: string,
+) {
     printCardState.preview = image;
 }

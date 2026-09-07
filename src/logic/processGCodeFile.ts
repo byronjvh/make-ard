@@ -5,7 +5,7 @@ import { extractPrintCardMetadata, type PrintCardMetadata } from "./extractPrint
 import { modelCenter } from "./modelCenter";
 import { makeExtrusionsRectangular } from "./makeExtrusionsRectangular";
 import * as THREE from "three";
-import { setPrintCardMetadata } from "./printCardState";
+import { setPrintCardState } from "./printCardState";
 
 export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, modelColor: string, currentAngle: CameraAngle = cameraAnglesOptions[0], currentZoom: Zoom = zoomOptions[0]) {
 
@@ -141,7 +141,7 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, mo
 
     if (initialImage) {
         metadata = extractPrintCardMetadata(gcode, file.name, bounds)
-        setPrintCardMetadata(metadata, initialImage);
+        setPrintCardState(metadata, initialImage);
         window.dispatchEvent(
             new CustomEvent("print-card-state-ready"),
         );

@@ -73,6 +73,7 @@ import BenchyLoader from "./BenchyLoader.astro";
     import { captureCanvas } from "../logic/processGCodeFile";
     import { cameraAnglesOptions } from "../logic/camera";
     import { dictionaryModelColorSchemes } from "../logic/themes";
+    import { setPrintCardPreview } from "../logic/printCardState";
 
     // =========================================================
     // ELEMENTOS
@@ -208,16 +209,14 @@ import BenchyLoader from "./BenchyLoader.astro";
 
         currentImageUrl = image;
 
-        window.dispatchEvent(
-            new CustomEvent("gcode-preview-ready", {
-                detail: {
-                    image,
-                },
-            }),
-        );
+        // Actualizar el estado compartido
+        setPrintCardPreview(image);
+
+        // Avisar a PrintCard de que el estado cambió
+        window.dispatchEvent(new CustomEvent("print-card-state-ready"));
     }
 
-    async function setPrintCardLoading(loading: boolean) {
+    function setPrintCardLoading(loading: boolean) {
         window.dispatchEvent(
             new CustomEvent("print-card-update", {
                 detail: {
@@ -261,7 +260,7 @@ import BenchyLoader from "./BenchyLoader.astro";
         const select = event.currentTarget as HTMLSelectElement;
         const selectedValue = select.value as CameraAngle;
 
-        if (!selectedValue) return;
+        if (!selectedValue) return setPrintCardLoading(false);
 
         currentAngle = selectedValue;
 
@@ -278,7 +277,7 @@ import BenchyLoader from "./BenchyLoader.astro";
         const select = event.currentTarget as HTMLSelectElement;
         const selectedValue = select.value as Zoom;
 
-        if (!selectedValue) return;
+        if (!selectedValue) return setPrintCardLoading(false);
 
         currentZoom = selectedValue;
 
@@ -292,9 +291,9 @@ import BenchyLoader from "./BenchyLoader.astro";
         const select = event.currentTarget as HTMLSelectElement;
         const selectedValue =
             select.value as keyof typeof dictionaryModelColorSchemes;
-
-        if (!selectedValue) return;
         setPrintCardLoading(true);
+
+        if (!selectedValue) return setPrintCardLoading(false);
 
         currentModelColor = dictionaryModelColorSchemes[selectedValue];
 
