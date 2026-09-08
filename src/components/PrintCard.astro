@@ -11,11 +11,9 @@ import {
     Box,
     Landmark,
 } from "@lucide/astro";
-
-const { metadata, image, loading } = Astro.props;
 ---
 
-<article id="printCard" class="printCard shadow">
+<article id="printCard" class="printCard shadow theme-blueprint">
     <header>
         <div class="printCard-thumbnail-wrapper">
             <img
@@ -31,9 +29,9 @@ const { metadata, image, loading } = Astro.props;
         </div>
         <div class="printCard-header-text">
             <div>
-                <h3>Título de la card</h3>
-                <p class="printCard-description">
-                    Esto es una descripción corta del modelo
+                <h3 id="print-card-title">Título de la card</h3>
+                <p id="print-card-description" class="printCard-description">
+                    Descripción corta del modelo 3D
                 </p>
             </div>
             <div class="printCard-header-info">
@@ -82,7 +80,7 @@ const { metadata, image, loading } = Astro.props;
             <LayersArrowDown class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="layerHeight">
                 <h4>Layer Height</h4>
-                <span> 0.20 mm </span>
+                <p>0.20 mm</p>
             </div>
         </li>
         <li class="printCard-list-item">
@@ -93,41 +91,44 @@ const { metadata, image, loading } = Astro.props;
             />
             <div data-field="infill">
                 <h4>Infill</h4>
-                <span> 15% Gyroid </span>
+                <p>15% Gyroid</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <BrickWall class="icon-data" stroke-width={1.5} size={26} />
             <div data-field="walls">
                 <h4>Walls</h4>
-                <span> 3 walls </span>
+                <p>3 walls</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Box class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="material">
                 <h4>Material</h4>
-                <span> PLA </span>
+                <p>PLA</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Nozzle class="icon-data" size={22} stroke-width={1.5} />
             <div data-field="nozzleDiameter">
                 <h4>Nozzle</h4>
-                <span> 0.4 mm </span>
+                <p>0.4 mm</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Landmark class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="supports">
                 <h4>Supports</h4>
-                <span> No </span>
+                <p>No</p>
             </div>
         </li>
     </ul>
     <footer class="printCard-footer">
-        <p class="printCard-printer">Flashforge AD5X</p>
-        <p class="signature">Made by @byronjvh</p>
+        <p id="print-card-printer" class="printCard-printer">Flashforge AD5X</p>
+        <p class="signature">
+            Made by @
+            <span id="print-card-signature">username</span>
+        </p>
     </footer>
 </article>
 
@@ -137,23 +138,45 @@ const { metadata, image, loading } = Astro.props;
         type FormattedPrintCardMetadata,
     } from "../logic/formatMetadata";
 
-    import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
     import { printCardState } from "../logic/printCardState";
+    import { defaultPrintCardUserData } from "../logic/PrintCardUserData";
+    import type { PrintCardFormData } from "../logic/setupPrintCardForm";
 
-    const printCardThumbnail = document.querySelector(".printCard-thumbnail");
+    const printCardThumbnail = document.querySelector<HTMLImageElement>(
+        ".printCard-thumbnail",
+    );
     const benchyLoader = document.querySelector("#printCard-loader");
     const printCard = document.querySelector(".printCard");
+    const printCardTitle =
+        document.querySelector<HTMLParagraphElement>("#print-card-title");
+    const printCardDescription = document.querySelector<HTMLParagraphElement>(
+        "#print-card-description",
+    );
+    const printCardPrinter = document.querySelector<HTMLParagraphElement>(
+        "#print-card-printer",
+    );
+    const printCardSignature = document.querySelector<HTMLSpanElement>(
+        "#print-card-signature",
+    );
 
-    window.addEventListener("print-card-state-ready", () => {
-        const { preview, printCardMetadata } = printCardState;
+    window.addEventListener("print-card-preview-ready", () => {
+        const { preview } = printCardState;
 
-        if (!preview || !printCardMetadata) return;
+        if (!printCardThumbnail || !preview) return;
+        printCardThumbnail.src = preview;
+    });
 
-        const image = document.querySelector<HTMLImageElement>(
-            ".printCard-thumbnail",
-        );
-        if (!image) return;
-        image.src = preview;
+    window.addEventListener("print-card-metadata-ready", () => {
+        const { printCardMetadata } = printCardState;
+
+        if (!printCardMetadata || !printCardTitle || !printCardPrinter) return;
+
+        printCardTitle.innerText =
+            printCardMetadata.modelName?.replaceAll("_", " ") ||
+            defaultPrintCardUserData.modelName;
+        printCardPrinter.innerText =
+            printCardMetadata.printer || defaultPrintCardUserData.printer;
+
         updatePrintCard(formatMetadata(printCardMetadata));
     });
 
@@ -185,13 +208,35 @@ const { metadata, image, loading } = Astro.props;
             valueElement.textContent = String(value ?? "");
         });
     }
+
+    window.addEventListener("print-card-form-update", (e) => {
+        const detail = (e as CustomEvent).detail as PrintCardFormData;
+        if (
+            !printCardTitle ||
+            !printCardDescription ||
+            !printCardPrinter ||
+            !printCardSignature
+        )
+            return;
+        printCardTitle.innerText =
+            detail.modelName.replaceAll("_", " ") ||
+            defaultPrintCardUserData.modelName;
+        printCardDescription.innerText =
+            detail.description || defaultPrintCardUserData.description;
+        printCardPrinter.innerText =
+            detail.printer || defaultPrintCardUserData.printer;
+        printCardSignature.innerText =
+            detail.signature || defaultPrintCardUserData.signature;
+
+        updatePrintCard(detail);
+    });
 </script>
 
 <style>
     .printCard {
-        --bg-color: #fff;
-        --bg-img: #dfdfff;
-        --model-color: #d19a45;
+        --bg-color: #eef3fb;
+        --bg-img: #dbe6fa;
+        --model-color: #c8a85a;
         --border-color: rgba(0, 0, 0, 0.1);
         --font-title: "Montserrat", sans-serif;
         --font-data: "Ubuntu Mono", sans-serif;
@@ -239,10 +284,12 @@ const { metadata, image, loading } = Astro.props;
         padding-top: 8px;
         height: 42px;
         font-size: 28px;
+        /* font-weight: 700; */
         margin: 0;
         margin-bottom: 2px;
         color: var(--title-color);
         font-family: var(--font-title);
+        text-transform: capitalize;
     }
 
     .printCard-header-info {
@@ -370,8 +417,8 @@ const { metadata, image, loading } = Astro.props;
     /* 1. Blueprint */
     .printCard.theme-blueprint {
         --font-title: "Montserrat", sans-serif;
-        --bg-color: #eef3fb;
-        --bg-img: #dbe6fa;
+        --bg-color: #fdfeff;
+        --bg-img: #ebeefa;
         --model-color: #c8a85a;
         --border-color: rgba(20, 50, 90, 0.15);
         --bg-footer: rgba(20, 50, 90, 0.08);
@@ -449,6 +496,21 @@ const { metadata, image, loading } = Astro.props;
         --description-color: #9fb4c9;
         --data-color: #e8fbff;
         --subtitle-color: #718aa3;
+    }
+
+    .printCard.theme-toy {
+        --font-title: "Sriracha", cursive;
+        --bg-color: #fef0fa;
+        --bg-img: #ffd6ec;
+        --model-color: #3ad1c4;
+        --border-color: rgba(210, 40, 150, 0.18);
+        --bg-footer: rgba(210, 40, 150, 0.08);
+        --icon-color: #ff4fa3;
+        --icon-color-2: #7c4dff;
+        --title-color: #7a1a6e;
+        --description-color: #9c5a8f;
+        --data-color: #3a1030;
+        --subtitle-color: #b487ab;
     }
 
     .printCard.shadow {

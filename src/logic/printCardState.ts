@@ -23,3 +23,8 @@ export function setPrintCardPreview(
 ) {
     printCardState.preview = image;
 }
+export function setPrintCardMetadata(
+    metadata: PrintCardMetadata,
+) {
+    printCardState.printCardMetadata = metadata;
+}

@@ -73,8 +73,12 @@ import BenchyLoader from "./BenchyLoader.astro";
     import { captureCanvas } from "../logic/processGCodeFile";
     import { cameraAnglesOptions } from "../logic/camera";
     import { dictionaryModelColorSchemes } from "../logic/themes";
-    import { setPrintCardPreview } from "../logic/printCardState";
 
+    import { extractPrintCardMetadata } from "../logic/extractPrintCardMetadata";
+    import {
+        setPrintCardMetadata,
+        setPrintCardPreview,
+    } from "../logic/printCardState";
     // =========================================================
     // ELEMENTOS
     // =========================================================
@@ -182,6 +186,18 @@ import BenchyLoader from "./BenchyLoader.astro";
             scene = result.scene;
             camera = result.camera;
 
+            await updatePrintCardImage();
+
+            const metadata = extractPrintCardMetadata(
+                result.gcode,
+                file.name,
+                result.bounds,
+            );
+
+            setPrintCardMetadata(metadata);
+
+            window.dispatchEvent(new CustomEvent("print-card-metadata-ready"));
+
             uploadWrapper.classList.add("hide");
             printCardContainer.classList.remove("hide");
             setLoading(false);
@@ -212,7 +228,7 @@ import BenchyLoader from "./BenchyLoader.astro";
         setPrintCardPreview(image);
 
         // Avisar a PrintCard de que el estado cambió
-        window.dispatchEvent(new CustomEvent("print-card-state-ready"));
+        window.dispatchEvent(new CustomEvent("print-card-preview-ready"));
     }
 
     function setPrintCardLoading(loading: boolean) {
@@ -244,6 +260,17 @@ import BenchyLoader from "./BenchyLoader.astro";
             renderer = result.renderer;
             scene = result.scene;
             camera = result.camera;
+            await updatePrintCardImage();
+
+            const metadata = extractPrintCardMetadata(
+                result.gcode,
+                file.name,
+                result.bounds,
+            );
+
+            setPrintCardMetadata(metadata);
+
+            window.dispatchEvent(new CustomEvent("print-card-metadata-ready"));
 
             uploadWrapper.classList.add("hide");
             printCardContainer.classList.remove("hide");
@@ -294,13 +321,6 @@ import BenchyLoader from "./BenchyLoader.astro";
         if (!selectedValue) return setPrintCardLoading(false);
 
         currentModelColor = dictionaryModelColorSchemes[selectedValue];
-
-        console.log(
-            "Selected theme:",
-            selectedValue,
-            "Model color:",
-            currentModelColor,
-        );
 
         if (!file) return;
 

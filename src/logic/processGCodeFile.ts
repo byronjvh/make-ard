@@ -1,11 +1,9 @@
 import { GCodePreview } from "gcode-preview";
 import { removePurgeLines } from "./GCodeRemovePurgeLines";
 import { cameraAnglesOptions, setCameraView, zoomOptions, type CameraAngle, type Zoom } from "./camera";
-import { extractPrintCardMetadata, type PrintCardMetadata } from "./extractPrintCardMetadata";
 import { modelCenter } from "./modelCenter";
 import { makeExtrusionsRectangular } from "./makeExtrusionsRectangular";
 import * as THREE from "three";
-import { setPrintCardState } from "./printCardState";
 
 export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, modelColor: string, currentAngle: CameraAngle = cameraAnglesOptions[0], currentZoom: Zoom = zoomOptions[0]) {
 
@@ -67,18 +65,6 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, mo
 
     scene.background = null;
 
-    if (renderer) {
-        console.log(
-            "MSAA máximo disponible:",
-            renderer.capabilities?.maxSamples,
-        );
-
-        console.log(
-            "Antialias activo:",
-            renderer.getContext?.().getContextAttributes?.().antialias,
-        );
-    }
-
     const buildVolumeFromScene =
         preview.sceneManager.scene.getObjectByName("BuildVolume");
 
@@ -137,15 +123,6 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, mo
     );
 
     ok = initialImage ? true : false;
-    let metadata: PrintCardMetadata
-
-    if (initialImage) {
-        metadata = extractPrintCardMetadata(gcode, file.name, bounds)
-        setPrintCardState(metadata, initialImage);
-        window.dispatchEvent(
-            new CustomEvent("print-card-state-ready"),
-        );
-    }
 
     return {
         ok,
@@ -153,6 +130,8 @@ export async function processGCodeFile(file: File, canvas: HTMLCanvasElement, mo
         renderer,
         scene,
         camera,
+        gcode,
+        bounds,
     };
 }
 
