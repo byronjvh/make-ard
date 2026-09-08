@@ -4,6 +4,7 @@ export const THEMES = [
     "theme-matcha",
     "theme-cobre",
     "theme-neon",
+    "theme-toy",
 ] as const;
 
 export const dictionaryThemes = {
@@ -12,6 +13,7 @@ export const dictionaryThemes = {
     "theme-matcha": "Matcha",
     "theme-cobre": "Cobre",
     "theme-neon": "Neon",
+    "theme-toy": "Toy",
 };
 
 export const dictionaryModelColorSchemes = {
@@ -25,5 +27,7 @@ export const dictionaryModelColorSchemes = {
     "theme-cobre": "#66927d",
 
     "theme-neon": "#c7cc63",
+
+    "theme-toy": "#2ec4b6",
 
 };

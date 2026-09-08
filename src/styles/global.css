@@ -45,3 +45,56 @@
     --card-scale: 0.9;
     --wrapper-padding: 20px;
 }
+
+.printCard {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+    font-family: "Ubuntu mono";
+    src: url("/fonts/UbuntuMono-Bold.ttf") format("truetype");
+    font-weight: 400 600;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("/fonts/Montserrat-VariableFont.ttf") format("truetype");
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Righteous";
+    src: url("/fonts/Righteous-Regular.ttf") format("truetype");
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Goldman";
+    src: url("/fonts/Goldman-Bold.ttf") format("truetype");
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Sriracha";
+    src: url("/fonts/Sriracha-Regular.ttf") format("truetype");
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Great Vibes";
+    src: url("/fonts/GreatVibes-Regular.ttf") format("truetype");
+    font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+}
