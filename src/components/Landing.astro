@@ -56,64 +56,151 @@ import GitHub from "./icons/GitHub.astro";
 				</div>
 			</div>
 		</div>
-		<form class="printCard-form" action="">
+		<form id="print-card-form" class="printCard-form">
 			<span class="corner tl"></span>
 			<span class="corner br"></span>
+
 			<h3>DATOS DEL MODELO</h3>
+
 			<div class="printCard-form-field">
-				<label for="">Nombre del modelo</label>
-				<input type="text" placeholder="Ej. Dinosaurio 3D" />
-			</div>
-			<div class="printCard-form-field">
-				<label for="">Descripción del modelo</label>
+				<label for="modelName">Nombre del modelo</label>
 				<input
+					id="modelName"
+					name="modelName"
+					type="text"
+					placeholder="Ej. Dinosaurio 3D"
+				/>
+			</div>
+
+			<div class="printCard-form-field">
+				<label for="description">Descripción del modelo</label>
+				<input
+					id="description"
+					name="description"
 					type="text"
 					placeholder="Ej. Juguete infantil de dinosaurio, impreso en 3D"
 				/>
 			</div>
+
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="">Print Time</label>
-					<input type="text" placeholder="1h 45m" />
+					<label for="printTime">Print Time</label>
+					<input
+						id="printTime"
+						name="printTime"
+						type="text"
+						placeholder="1h 45m"
+					/>
 				</div>
+
 				<div class="printCard-form-field">
-					<label for="">Filament Used</label>
-					<input type="text" placeholder="90g" />
+					<label for="filamentUsed">Filament Used</label>
+					<input
+						id="filamentUsed"
+						name="filamentUsed"
+						type="text"
+						placeholder="90g"
+					/>
 				</div>
+
 				<div class="printCard-form-field">
-					<label for="">Dimensions</label>
-					<input type="text" placeholder="120x90x180 mm" />
+					<label for="dimensions">Dimensions</label>
+					<input
+						id="dimensions"
+						name="dimensions"
+						type="text"
+						placeholder="120x90x180 mm"
+					/>
 				</div>
 			</div>
+
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="">Layer Height</label>
-					<input type="text" placeholder="0.20 mm" />
+					<label for="layerHeight">Layer Height</label>
+					<input
+						id="layerHeight"
+						name="layerHeight"
+						type="text"
+						placeholder="0.20 mm"
+					/>
 				</div>
+
 				<div class="printCard-form-field">
-					<label for="">Infill</label>
-					<input type="text" placeholder="15%" />
+					<label for="infill">Infill</label>
+					<input
+						id="infill"
+						name="infill"
+						type="text"
+						placeholder="15%"
+					/>
 				</div>
+
 				<div class="printCard-form-field">
-					<label for="">Walls</label>
-					<input type="text" placeholder="3" />
+					<label for="walls">Walls</label>
+					<input
+						id="walls"
+						name="walls"
+						type="text"
+						placeholder="3"
+					/>
 				</div>
 			</div>
+
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="">Material</label>
-					<input type="text" placeholder="PLA" />
+					<label for="material">Material</label>
+					<input
+						id="material"
+						name="material"
+						type="text"
+						placeholder="PLA"
+					/>
 				</div>
+
 				<div class="printCard-form-field">
-					<label for="">Nozzle</label>
-					<input type="text" placeholder="0.4 mm" />
+					<label for="nozzleDiameter">Nozzle</label>
+					<input
+						id="nozzleDiameter"
+						name="nozzleDiameter"
+						type="text"
+						placeholder="0.4 mm"
+					/>
 				</div>
+
 				<div class="printCard-form-field">
-					<label for="">Supports</label>
-					<input type="text" placeholder="Yes" />
+					<label for="supports">Supports</label>
+					<input
+						id="supports"
+						name="supports"
+						type="text"
+						placeholder="Yes"
+					/>
 				</div>
 			</div>
-			<button>Descargar Print Card</button>
+
+			<div class="printCard-form-row">
+				<div class="printCard-form-field">
+					<label for="printer">Printer</label>
+					<input
+						id="printer"
+						name="printer"
+						type="text"
+						placeholder="Flashforge AD5X"
+					/>
+				</div>
+
+				<div class="printCard-form-field">
+					<label for="signature">Signature</label>
+					<input
+						id="signature"
+						name="signature"
+						type="text"
+						placeholder="username"
+					/>
+				</div>
+			</div>
+
+			<button type="submit">Descargar Print Card</button>
 		</form>
 	</section>
 </div>
@@ -332,9 +419,6 @@ import GitHub from "./icons/GitHub.astro";
 </style>
 
 <script>
-	import { formatMetadata } from "../logic/formatMetadata";
-	import type { PrintCardMetadata } from "../logic/extractPrintCardMetadata";
-
 	const dictionaryAngles = {
 		isoFL: "Isometric FL",
 		isoFR: "Isometric FR",
@@ -351,7 +435,31 @@ import GitHub from "./icons/GitHub.astro";
 	import { zoomOptions } from "../logic/camera";
 	import { dictionaryThemes, THEMES } from "../logic/themes";
 	import { printCardState } from "../logic/printCardState";
-	const printCard = document.getElementById("printCard");
+	import { setupPrintCardForm } from "../logic/setupPrintCardForm";
+	import {
+		formatMetadata,
+		type FormattedPrintCardMetadata,
+	} from "../logic/formatMetadata";
+	import html2canvas from "html2canvas";
+	const printCard = document.querySelector<HTMLElement>(".printCard");
+	const form = document.querySelector<HTMLFormElement>("#print-card-form");
+	form?.addEventListener("submit", async (e) => {
+		e.preventDefault();
+
+		if (!printCard) return;
+		await document.fonts.ready;
+		await document.fonts.load("700 28px 'Merriweather'");
+
+		const canvas = await html2canvas(printCard, {
+			useCORS: true,
+			scale: 2,
+			backgroundColor: null,
+		});
+		const link = document.createElement("a");
+		link.download = "printcard.png";
+		link.href = canvas.toDataURL("image/png");
+		link.click();
+	});
 	for (const zoom of zoomOptions) {
 		const option = document.createElement("option");
 		option.value = zoom;
@@ -380,12 +488,11 @@ import GitHub from "./icons/GitHub.astro";
 			});
 	}
 
-	window.addEventListener("print-card-state-ready", () => {
+	window.addEventListener("print-card-metadata-ready", () => {
 		const { printCardMetadata } = printCardState;
 
 		if (!printCardMetadata) return;
-
-		console.log(printCardMetadata);
+		fillPrintCardForm(formatMetadata(printCardMetadata));
 	});
 
 	const shadowInput = document.getElementById(
@@ -410,4 +517,20 @@ import GitHub from "./icons/GitHub.astro";
 			printCard?.classList.remove("border");
 		}
 	});
+
+	function fillPrintCardForm(metadata: FormattedPrintCardMetadata) {
+		if (!form) return;
+
+		for (const [key, value] of Object.entries(metadata)) {
+			const input = form.elements.namedItem(key);
+
+			if (input instanceof HTMLInputElement) {
+				input.value = value ?? "";
+			}
+		}
+	}
+
+	if (form) {
+		setupPrintCardForm(form);
+	}
 </script>
