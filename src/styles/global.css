@@ -46,6 +46,10 @@
     --wrapper-padding: 20px;
 }
 
+img {
+    display: initial;
+}
+
 .printCard {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -62,7 +66,7 @@
 @font-face {
     font-family: "Montserrat";
     src: url("/fonts/Montserrat-VariableFont.ttf") format("truetype");
-    font-weight: 400 900;
+    font-weight: 700;
     font-style: normal;
     font-display: block;
 }
@@ -95,6 +99,14 @@
     font-family: "Great Vibes";
     src: url("/fonts/GreatVibes-Regular.ttf") format("truetype");
     font-weight: 400 900;
+    font-style: normal;
+    font-display: block;
+}
+
+@font-face {
+    font-family: "Merriweather";
+    src: url("/fonts/Merriweather-VariableFont.ttf") format("truetype");
+    font-weight: 700;
     font-style: normal;
     font-display: block;
 }

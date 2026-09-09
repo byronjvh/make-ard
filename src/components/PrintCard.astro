@@ -237,7 +237,7 @@ import {
         --bg-color: #eef3fb;
         --bg-img: #dbe6fa;
         --model-color: #c8a85a;
-        --border-color: rgba(0, 0, 0, 0.1);
+        --border-color: rgba(0, 0, 0, 0.2);
         --font-title: "Montserrat", sans-serif;
         --font-data: "Ubuntu Mono", sans-serif;
         --font-default: "Google sans", sans-serif;
@@ -248,7 +248,7 @@ import {
         --description-color: #445;
         --data-color: #112;
         --subtitle-color: #667;
-        --shadow: 0 10px 10px 6px rgba(0, 0, 0, 0.05);
+        --shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
         --border: 2px solid var(--icon-color-2);
 
         width: var(--card-width);
@@ -258,7 +258,7 @@ import {
         transform-origin: top left;
         background-color: var(--bg-color);
         padding: 22px;
-        display: flex;
+        display: inline-flex;
         flex-direction: column;
         border-radius: 16px;
         gap: 20px;
@@ -271,6 +271,7 @@ import {
         gap: 20px;
         height: 160px;
         max-height: 160px;
+        align-items: start;
     }
 
     .printCard-header-text {
@@ -278,15 +279,15 @@ import {
         flex-direction: column;
         gap: 20px;
         color: var(--description-color);
+        padding-top: 4px;
+        width: 100%;
+        height: 100%;
     }
 
     .printCard h3 {
-        padding-top: 8px;
         height: 42px;
         font-size: 28px;
-        /* font-weight: 700; */
         margin: 0;
-        margin-bottom: 2px;
         color: var(--title-color);
         font-family: var(--font-title);
         text-transform: capitalize;
@@ -317,8 +318,8 @@ import {
 
     .separator-horizontal {
         width: 100%;
-        height: 2px;
-        flex: 0 0 2px;
+        height: 1px;
+        flex: 0 0 1px;
 
         background-color: var(--border-color);
     }
@@ -330,8 +331,9 @@ import {
     }
 
     .printCard-thumbnail-wrapper {
+        min-width: 160px;
         width: 160px;
-        aspect-ratio: 1/1;
+        height: 160px;
         border-radius: 8px;
         background-color: var(--bg-img);
         display: flex;
@@ -340,8 +342,8 @@ import {
     }
     .printCard-thumbnail {
         object-fit: cover;
-        width: 100%;
-        height: 100%;
+        width: 160px;
+        height: 160px;
     }
     .printCard-thumbnail.hide {
         display: none;
@@ -420,7 +422,7 @@ import {
         --bg-color: #fdfeff;
         --bg-img: #ebeefa;
         --model-color: #c8a85a;
-        --border-color: rgba(20, 50, 90, 0.15);
+        --border-color: rgba(20, 50, 90, 0.25);
         --bg-footer: rgba(20, 50, 90, 0.08);
         --icon-color: #2f6fed;
         --icon-color-2: #6a93e0;
@@ -436,7 +438,7 @@ import {
         --bg-color: #1b1e24;
         --bg-img: #2a2e37;
         --model-color: #a8c56a;
-        --border-color: rgba(255, 255, 255, 0.08);
+        --border-color: rgba(255, 255, 255, 0.2);
         --bg-footer: rgba(255, 255, 255, 0.06);
         --icon-color: #ff7a30;
         --icon-color-2: #c95d20;
@@ -456,7 +458,7 @@ import {
         --bg-color: #f6efe3;
         --bg-img: #ecdec4;
         --model-color: #66927d;
-        --border-color: rgba(120, 80, 40, 0.15);
+        --border-color: rgba(120, 80, 40, 0.25);
         --bg-footer: rgba(120, 80, 40, 0.1);
         --icon-color: #b5651d;
         --icon-color-2: #8a4a15;
@@ -472,7 +474,7 @@ import {
         --bg-color: #eef3ea;
         --bg-img: #dbe6d3;
         --model-color: #c995a2;
-        --border-color: rgba(60, 100, 50, 0.15);
+        --border-color: rgba(60, 100, 50, 0.25);
         --bg-footer: rgba(60, 100, 50, 0.08);
         --icon-color: #4c7a3f;
         --icon-color-2: #7ba36a;
@@ -488,7 +490,7 @@ import {
         --bg-color: #0d0f1a;
         --bg-img: #1a1d2e;
         --model-color: #c7cc63;
-        --border-color: rgba(255, 255, 255, 0.08);
+        --border-color: rgba(255, 255, 255, 0.15);
         --bg-footer: rgba(255, 255, 255, 0.05);
         --icon-color: #37e6e6;
         --icon-color-2: #ff3fa4;
@@ -500,17 +502,23 @@ import {
 
     .printCard.theme-toy {
         --font-title: "Sriracha", cursive;
-        --bg-color: #fef0fa;
-        --bg-img: #ffd6ec;
-        --model-color: #3ad1c4;
-        --border-color: rgba(210, 40, 150, 0.18);
-        --bg-footer: rgba(210, 40, 150, 0.08);
-        --icon-color: #ff4fa3;
-        --icon-color-2: #7c4dff;
-        --title-color: #7a1a6e;
-        --description-color: #9c5a8f;
-        --data-color: #3a1030;
-        --subtitle-color: #b487ab;
+
+        --bg-color: #fff8df;
+        --bg-img: #f5dfb0;
+
+        --model-color: #4ecdc4;
+
+        --border-color: rgba(220, 120, 90, 0.22);
+        --bg-footer: rgba(220, 120, 90, 0.07);
+
+        --icon-color: #d98b78;
+        --icon-color-2: #7f9ac9;
+
+        --title-color: #d46f5c;
+        --description-color: #92756b;
+
+        --data-color: #493b37;
+        --subtitle-color: #b39b91;
     }
 
     .printCard.shadow {

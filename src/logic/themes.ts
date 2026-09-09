@@ -28,6 +28,6 @@ export const dictionaryModelColorSchemes = {
 
     "theme-neon": "#c7cc63",
 
-    "theme-toy": "#2ec4b6",
+    "theme-toy": "#4ecdc4",
 
 };

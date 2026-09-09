@@ -68,6 +68,7 @@ import GitHub from "./icons/GitHub.astro";
 					id="modelName"
 					name="modelName"
 					type="text"
+					required="true"
 					placeholder="Ej. Dinosaurio 3D"
 				/>
 			</div>
@@ -78,6 +79,7 @@ import GitHub from "./icons/GitHub.astro";
 					id="description"
 					name="description"
 					type="text"
+					required="true"
 					placeholder="Ej. Juguete infantil de dinosaurio, impreso en 3D"
 				/>
 			</div>
@@ -89,6 +91,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="printTime"
 						name="printTime"
 						type="text"
+						required="true"
 						placeholder="1h 45m"
 					/>
 				</div>
@@ -99,6 +102,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="filamentUsed"
 						name="filamentUsed"
 						type="text"
+						required="true"
 						placeholder="90g"
 					/>
 				</div>
@@ -109,6 +113,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="dimensions"
 						name="dimensions"
 						type="text"
+						required="true"
 						placeholder="120x90x180 mm"
 					/>
 				</div>
@@ -121,6 +126,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="layerHeight"
 						name="layerHeight"
 						type="text"
+						required="true"
 						placeholder="0.20 mm"
 					/>
 				</div>
@@ -131,6 +137,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="infill"
 						name="infill"
 						type="text"
+						required="true"
 						placeholder="15%"
 					/>
 				</div>
@@ -141,6 +148,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="walls"
 						name="walls"
 						type="text"
+						required="true"
 						placeholder="3"
 					/>
 				</div>
@@ -153,6 +161,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="material"
 						name="material"
 						type="text"
+						required="true"
 						placeholder="PLA"
 					/>
 				</div>
@@ -163,6 +172,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="nozzleDiameter"
 						name="nozzleDiameter"
 						type="text"
+						required="true"
 						placeholder="0.4 mm"
 					/>
 				</div>
@@ -173,6 +183,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="supports"
 						name="supports"
 						type="text"
+						required="true"
 						placeholder="Yes"
 					/>
 				</div>
@@ -185,6 +196,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="printer"
 						name="printer"
 						type="text"
+						required="true"
 						placeholder="Flashforge AD5X"
 					/>
 				</div>
@@ -195,6 +207,7 @@ import GitHub from "./icons/GitHub.astro";
 						id="signature"
 						name="signature"
 						type="text"
+						required="true"
 						placeholder="username"
 					/>
 				</div>
@@ -441,6 +454,7 @@ import GitHub from "./icons/GitHub.astro";
 		type FormattedPrintCardMetadata,
 	} from "../logic/formatMetadata";
 	import html2canvas from "html2canvas";
+	let hasShadow = true;
 	const printCard = document.querySelector<HTMLElement>(".printCard");
 	const form = document.querySelector<HTMLFormElement>("#print-card-form");
 	form?.addEventListener("submit", async (e) => {
@@ -448,20 +462,27 @@ import GitHub from "./icons/GitHub.astro";
 
 		if (!printCard) return;
 		await document.fonts.ready;
-		await document.fonts.load("700 28px 'Merriweather'");
-
 		const canvas = await html2canvas(printCard, {
 			useCORS: true,
-			scale: 2,
+			scale: 1,
 			backgroundColor: null,
-			x: -20,
-			y: -20,
-			width: printCard.offsetWidth + 40,
-			height: printCard.offsetHeight + 40,
 		});
+
+		let finalCanvas = canvas;
+
+		if (hasShadow) {
+			const shadowCanvas = await createShadowCanvas(canvas);
+
+			if (!shadowCanvas) return;
+
+			finalCanvas = shadowCanvas;
+		}
+
 		const link = document.createElement("a");
+
 		link.download = "printcard.png";
-		link.href = canvas.toDataURL("image/png");
+		link.href = finalCanvas.toDataURL("image/png");
+
 		link.click();
 	});
 	for (const zoom of zoomOptions) {
@@ -510,8 +531,10 @@ import GitHub from "./icons/GitHub.astro";
 	shadowInput.addEventListener("change", () => {
 		if (shadowInput.checked) {
 			printCard?.classList.add("shadow");
+			hasShadow = true;
 		} else {
 			printCard?.classList.remove("shadow");
+			hasShadow = false;
 		}
 	});
 	borderInput.addEventListener("change", () => {
@@ -532,6 +555,34 @@ import GitHub from "./icons/GitHub.astro";
 				input.value = value ?? "";
 			}
 		}
+	}
+
+	async function createShadowCanvas(cardCanvas: HTMLCanvasElement) {
+		const padding = 20;
+
+		const shadowCanvas = document.createElement("canvas");
+
+		shadowCanvas.width = cardCanvas.width + padding * 2;
+		shadowCanvas.height = cardCanvas.height + padding * 2;
+
+		const ctx = shadowCanvas.getContext("2d");
+
+		if (!ctx) return null;
+
+		ctx.save();
+
+		ctx.shadowColor = "rgba(0, 0, 0, 0.1)";
+		ctx.shadowBlur = 12;
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 6;
+
+		ctx.drawImage(cardCanvas, padding, padding);
+
+		ctx.restore();
+
+		ctx.drawImage(cardCanvas, padding, padding);
+
+		return shadowCanvas;
 	}
 
 	if (form) {
