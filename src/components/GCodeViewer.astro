@@ -15,7 +15,11 @@ import BenchyLoader from "./BenchyLoader.astro";
             <span class="corner tr"></span>
             <span class="corner br"></span>
             <span class="corner bl"></span>
-            <input id="gcode-file" type="file" accept=".gcode,.gc,.gco" />
+            <input
+                id="gcode-file"
+                type="file"
+                accept=".gcode,.gc,.gco,.png,.jpg,.jpeg,.svg,.webp,.avif,.gif"
+            />
 
             <label for="gcode-file">
                 <span class="icon-wrapper">
@@ -98,6 +102,8 @@ import BenchyLoader from "./BenchyLoader.astro";
         document.querySelector<HTMLSelectElement>("#zoom-select");
     const themeSelect =
         document.querySelector<HTMLSelectElement>("#theme-select");
+    const cropSelect =
+        document.querySelector<HTMLSelectElement>("#crop-select");
     const arrowIcon = document.querySelector<HTMLElement>(".arrow-icon");
     const benchyLoader = document.querySelector<HTMLElement>(".benchy-loader");
 
@@ -115,7 +121,8 @@ import BenchyLoader from "./BenchyLoader.astro";
         !printCardContainer ||
         !viewSelect ||
         !zoomSelect ||
-        !themeSelect
+        !themeSelect ||
+        !cropSelect
     ) {
         throw new Error("No se encontraron los elementos necesarios");
     }
@@ -166,42 +173,71 @@ import BenchyLoader from "./BenchyLoader.astro";
         const extension = droppedFile.name.split(".").pop()?.toLowerCase();
 
         if (
-            extension !== "gcode" &&
-            extension !== "gc" &&
-            extension !== "gco"
+            extension === "gcode" ||
+            extension === "gc" ||
+            extension === "gco"
         ) {
-            console.warn("Archivo no compatible");
-            return;
-        }
+            file = droppedFile;
 
-        file = droppedFile;
+            fileNameElement.textContent = file.name;
 
-        fileNameElement.textContent = file.name;
-
-        const result = await processGCodeFile(file, canvas, currentModelColor);
-
-        if (result?.ok) {
-            preview = result.preview;
-            renderer = result.renderer;
-            scene = result.scene;
-            camera = result.camera;
-
-            await updatePrintCardImage();
-
-            const metadata = extractPrintCardMetadata(
-                result.gcode,
-                file.name,
-                result.bounds,
+            const result = await processGCodeFile(
+                file,
+                canvas,
+                currentModelColor,
             );
 
-            setPrintCardMetadata(metadata);
+            if (result?.ok) {
+                preview = result.preview;
+                renderer = result.renderer;
+                scene = result.scene;
+                camera = result.camera;
 
-            window.dispatchEvent(new CustomEvent("print-card-metadata-ready"));
+                await updatePrintCardImage();
 
+                const metadata = extractPrintCardMetadata(
+                    result.gcode,
+                    file.name,
+                    result.bounds,
+                );
+
+                setPrintCardMetadata(metadata);
+
+                window.dispatchEvent(
+                    new CustomEvent("print-card-metadata-ready"),
+                );
+                cropSelect.classList.add("hide");
+
+                uploadWrapper.classList.add("hide");
+                printCardContainer.classList.remove("hide");
+            }
+        } else if (
+            extension === "png" ||
+            extension === "jpg" ||
+            extension === "jpeg" ||
+            extension === "svg" ||
+            extension === "webp" ||
+            extension === "avif" ||
+            extension === "gif"
+        ) {
+            file = droppedFile;
+            fileNameElement.textContent = file.name;
+
+            const image = URL.createObjectURL(file);
+
+            setPrintCardPreview(image);
+
+            window.dispatchEvent(new CustomEvent("print-card-preview-ready"));
+
+            cropSelect.classList.remove("hide");
+            viewSelect.classList.add("hide");
+            zoomSelect.classList.add("hide");
             uploadWrapper.classList.add("hide");
             printCardContainer.classList.remove("hide");
-            setLoading(false);
+        } else {
+            console.warn("Archivo no compatible");
         }
+        setLoading(false);
     });
 
     // =========================================================
@@ -243,6 +279,7 @@ import BenchyLoader from "./BenchyLoader.astro";
 
     fileInput.addEventListener("change", async (event) => {
         const input = event.currentTarget as HTMLInputElement;
+
         setLoading(true);
 
         file = input.files?.[0];
@@ -252,7 +289,31 @@ import BenchyLoader from "./BenchyLoader.astro";
             return;
         }
 
+        const extension = file.name.split(".").pop()?.toLowerCase();
         fileNameElement.textContent = file.name;
+
+        if (
+            extension === "png" ||
+            extension === "jpg" ||
+            extension === "jpeg" ||
+            extension === "svg" ||
+            extension === "webp" ||
+            extension === "avif" ||
+            extension === "gif"
+        ) {
+            const image = URL.createObjectURL(file);
+
+            setPrintCardPreview(image);
+
+            window.dispatchEvent(new CustomEvent("print-card-preview-ready"));
+
+            cropSelect.classList.remove("hide");
+            viewSelect.classList.add("hide");
+            zoomSelect.classList.add("hide");
+            uploadWrapper.classList.add("hide");
+            printCardContainer.classList.remove("hide");
+            return setLoading(false);
+        }
 
         const result = await processGCodeFile(file, canvas, currentModelColor);
         if (result?.ok) {
@@ -272,6 +333,7 @@ import BenchyLoader from "./BenchyLoader.astro";
 
             window.dispatchEvent(new CustomEvent("print-card-metadata-ready"));
 
+            cropSelect.classList.add("hide");
             uploadWrapper.classList.add("hide");
             printCardContainer.classList.remove("hide");
             setLoading(false);
@@ -323,6 +385,21 @@ import BenchyLoader from "./BenchyLoader.astro";
         currentModelColor = dictionaryModelColorSchemes[selectedValue];
 
         if (!file) return;
+
+        const extension = file.name.split(".").pop()?.toLowerCase();
+
+        if (
+            extension === "png" ||
+            extension === "jpg" ||
+            extension === "jpeg" ||
+            extension === "svg" ||
+            extension === "webp" ||
+            extension === "avif" ||
+            extension === "gif"
+        ) {
+            setPrintCardLoading(false);
+            return;
+        }
 
         const result = await processGCodeFile(
             file,

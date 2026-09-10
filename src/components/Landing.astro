@@ -2,6 +2,7 @@
 import GCodeViewer from "./GCodeViewer.astro";
 import PrintCard from "./PrintCard.astro";
 import GitHub from "./icons/GitHub.astro";
+import { ImagePlus } from "@lucide/astro";
 ---
 
 <div id="container">
@@ -38,6 +39,13 @@ import GitHub from "./icons/GitHub.astro";
 					<select name="zoom" id="zoom-select"> </select>
 				</div>
 				<div class="selec-wrapper">
+					<label for="crop-select">Crop</label>
+					<select name="theme" id="crop-select">
+						<option value="cover">Cover</option>
+						<option value="contain">Preserve</option>
+					</select>
+				</div>
+				<div class="selec-wrapper">
 					<label for="theme-select">Tema</label>
 					<select name="theme" id="theme-select"> </select>
 				</div>
@@ -62,15 +70,25 @@ import GitHub from "./icons/GitHub.astro";
 
 			<h3>DATOS DEL MODELO</h3>
 
-			<div class="printCard-form-field">
-				<label for="modelName">Nombre del modelo</label>
-				<input
-					id="modelName"
-					name="modelName"
-					type="text"
-					required="true"
-					placeholder="Ej. Dinosaurio 3D"
-				/>
+			<div class="printCard-form-row">
+				<div class="printCard-form-field title">
+					<label for="modelName">Nombre del modelo</label>
+					<input
+						id="modelName"
+						name="modelName"
+						type="text"
+						required="true"
+						placeholder="Ej. Dinosaurio 3D"
+					/>
+				</div>
+				<div class="printCard-form-field changeFile">
+					<button class="changeFile-button">
+						<p class="changeFile-text">nombre_del_archivo.svg</p>
+						<span class="changeFile-icon-wrapper">
+							<ImagePlus size={18} />
+						</span>
+					</button>
+				</div>
 			</div>
 
 			<div class="printCard-form-field">
@@ -213,7 +231,9 @@ import GitHub from "./icons/GitHub.astro";
 				</div>
 			</div>
 
-			<button type="submit">Descargar Print Card</button>
+			<button class="printCard-form-download" type="submit"
+				>Descargar Print Card</button
+			>
 		</form>
 	</section>
 </div>
@@ -315,6 +335,9 @@ import GitHub from "./icons/GitHub.astro";
 		align-items: center;
 		gap: 4px;
 	}
+	.selec-wrapper:has(select.hide) {
+		display: none;
+	}
 	/* un estilo muy bonito para los selectores y las options */
 	.selec-wrapper label {
 		font-family: "Google Sans", sans-serif;
@@ -357,7 +380,7 @@ import GitHub from "./icons/GitHub.astro";
 		padding: 20px;
 		border-radius: 6px;
 	}
-	.printCard-form button {
+	.printCard-form-download {
 		border: none;
 		border-radius: 8px;
 		padding: 10px;
@@ -366,6 +389,10 @@ import GitHub from "./icons/GitHub.astro";
 		background-color: var(--accent);
 		font-family: "Google sans", sans-serif;
 		cursor: pointer;
+		transition: background 0.15s ease-out;
+	}
+	.printCard-form-download:hover {
+		background-color: var(--accent-dark);
 	}
 	.printCard-form h3 {
 		font-size: 14px;
@@ -379,9 +406,33 @@ import GitHub from "./icons/GitHub.astro";
 		gap: 4px;
 		font-size: "Google sans", sans-serif;
 	}
+	.printCard-form-field.changeFile {
+		width: max-content;
+		display: flex;
+		justify-content: end;
+		max-width: 154px;
+	}
+	.changeFile-button {
+		border: none;
+		background-color: transparent;
+		font-size: 12px;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		gap: 2px;
+		padding-bottom: 1px;
+		border-bottom: 1px solid var(--accent-dark);
+	}
+
+	.changeFile-icon-wrapper {
+		color: var(--accent-dark);
+	}
 	.printCard-form-field label {
 		color: var(--muted);
 		font-size: 14px;
+	}
+	.printCard-form-field.title {
+		flex: 1;
 	}
 
 	.printCard-form-field input {
@@ -456,7 +507,12 @@ import GitHub from "./icons/GitHub.astro";
 	import html2canvas from "html2canvas";
 	let hasShadow = true;
 	const printCard = document.querySelector<HTMLElement>(".printCard");
+	const printCardImg = document.querySelector<HTMLImageElement>(
+		".printCard-thumbnail",
+	);
 	const form = document.querySelector<HTMLFormElement>("#print-card-form");
+	const cropSelect =
+		document.querySelector<HTMLSelectElement>("#crop-select");
 	form?.addEventListener("submit", async (e) => {
 		e.preventDefault();
 
@@ -543,6 +599,14 @@ import GitHub from "./icons/GitHub.astro";
 		} else {
 			printCard?.classList.remove("border");
 		}
+	});
+	cropSelect?.addEventListener("change", (event) => {
+		const select = event.currentTarget as HTMLSelectElement;
+		const selectedValue = select.value;
+
+		if (!selectedValue || !printCardImg) return;
+
+		printCardImg.style.objectFit = selectedValue;
 	});
 
 	function fillPrintCardForm(metadata: FormattedPrintCardMetadata) {
