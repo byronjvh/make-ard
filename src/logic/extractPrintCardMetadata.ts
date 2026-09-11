@@ -3,6 +3,7 @@ import type { GCodeBounds } from "./GCodeRemovePurgeLines";
 export interface PrintCardMetadata {
 
     modelName: string | undefined;
+    fileName: string;
 
     dimensions:
     | {
@@ -38,12 +39,12 @@ export interface PrintCardMetadata {
 
 export function extractPrintCardMetadata(
     gcode: string,
-    filename?: string,
+    filename: string,
     bounds?: GCodeBounds | null
 ): PrintCardMetadata {
 
     const metadata: PrintCardMetadata = {
-
+        fileName: filename,
         modelName:
             filename
                 ?.replace(/\.[^/.]+$/, "")

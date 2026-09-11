@@ -1,8 +1,9 @@
 ---
+import BenchyLoader from "./BenchyLoader.astro";
 import GCodeViewer from "./GCodeViewer.astro";
 import PrintCard from "./PrintCard.astro";
 import GitHub from "./icons/GitHub.astro";
-import { ImagePlus } from "@lucide/astro";
+import { FileImage, RefreshCw } from "@lucide/astro";
 ---
 
 <div id="container">
@@ -11,8 +12,12 @@ import { ImagePlus } from "@lucide/astro";
 			<p class="logo">Make-ard</p>
 		</a>
 		<nav>
-			<a class="nav-link" href="#">Acerca de</a>
-			<a class="nav-link" href="#"><GitHub size="18" />byronjvh</a>
+			<a class="nav-link disabled" href="#">Suite</a>
+			<div class="nav-link-container">
+				<GitHub size="18" />
+				<a class="nav-link" href="#">Repositorio</a> ·
+				<a class="nav-link" href="#">byronjvh</a>
+			</div>
 		</nav>
 	</header>
 	<span class="landing-top-separator"></span>
@@ -49,7 +54,7 @@ import { ImagePlus } from "@lucide/astro";
 					<label for="theme-select">Tema</label>
 					<select name="theme" id="theme-select"> </select>
 				</div>
-				<div class="selec-wrapper">
+				<div class="selec-wrapper checkbox">
 					<label for="shadow-input">Shadow</label>
 					<input
 						type="checkbox"
@@ -58,8 +63,8 @@ import { ImagePlus } from "@lucide/astro";
 						id="shadow-input"
 					/>
 				</div>
-				<div class="selec-wrapper">
-					<label for="border-select">Border</label>
+				<div class="selec-wrapper checkbox">
+					<label for="border-input">Border</label>
 					<input type="checkbox" name="border" id="border-input" />
 				</div>
 			</div>
@@ -82,10 +87,25 @@ import { ImagePlus } from "@lucide/astro";
 					/>
 				</div>
 				<div class="printCard-form-field changeFile">
-					<button class="changeFile-button">
-						<p class="changeFile-text">nombre_del_archivo.svg</p>
-						<span class="changeFile-icon-wrapper">
-							<ImagePlus size={18} />
+					<label for="changeFile-button">Archivo</label>
+					<button
+						type="button"
+						id="changeFile-button"
+						class="changeFile-button"
+					>
+						<p class="changeFile-text">
+							<FileImage size={16} />
+							<span id="fileName-text-button">
+								nombre_del_archivo.svg
+							</span>
+						</p>
+						<span class="changeFile-icon"
+							><RefreshCw id="change-icon" size={18} />
+							<BenchyLoader
+								id="benchy-loader-form"
+								size={22}
+								class="benchy-loader-form"
+							/>
 						</span>
 					</button>
 				</div>
@@ -252,17 +272,31 @@ import { ImagePlus } from "@lucide/astro";
 		display: flex;
 		gap: 22px;
 		align-items: center;
+		font-family: "Google Sans", sans-serif;
 	}
 
 	.nav-link {
 		display: flex;
 		align-items: center;
 		gap: 8px;
-		font-family: "Google Sans", sans-serif;
 		font-weight: 500;
 		font-size: 16px;
-		color: #333;
+		color: var(--ink);
 		text-decoration: none;
+		transition: color 0.15s ease-out;
+	}
+	.nav-link.disabled {
+		color: var(--placeholder);
+		cursor: pointer;
+		pointer-events: none;
+	}
+	.nav-link:hover {
+		color: var(--accent-dark);
+	}
+	.nav-link-container {
+		display: flex;
+		align-items: center;
+		gap: 8px;
 	}
 
 	.logo-link {
@@ -355,6 +389,29 @@ import { ImagePlus } from "@lucide/astro";
 		font-weight: 500;
 		background-color: #fff;
 		color: #333;
+		cursor: pointer;
+		transition: border 0.15s ease-out;
+	}
+	.selec-wrapper select:hover {
+		border: 1px solid var(--accent);
+	}
+
+	.selec-wrapper.checkbox {
+		cursor: pointer;
+		color: var(--muted);
+	}
+	.selec-wrapper.checkbox label,
+	.selec-wrapper.checkbox input {
+		min-height: 30px;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		cursor: inherit;
+		transition: color 0.15s ease-out;
+		color: inherit;
+	}
+	.selec-wrapper.checkbox:hover {
+		color: var(--accent-dark);
 	}
 
 	.printCard-area {
@@ -406,26 +463,57 @@ import { ImagePlus } from "@lucide/astro";
 		gap: 4px;
 		font-size: "Google sans", sans-serif;
 	}
-	.printCard-form-field.changeFile {
-		width: max-content;
+	.changeFile-text {
+		padding-inline: 4px;
 		display: flex;
-		justify-content: end;
-		max-width: 154px;
+		color: var(--muted);
+		align-items: center;
+		max-width: 140px;
+	}
+
+	.changeFile-text span {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 	.changeFile-button {
-		border: none;
-		background-color: transparent;
-		font-size: 12px;
+		border-radius: 8px;
+		border: 1px solid var(--accent);
+		font-size: 13px;
+		height: 100%;
+		width: 100%;
 		display: flex;
 		align-items: center;
 		cursor: pointer;
-		gap: 2px;
-		padding-bottom: 1px;
-		border-bottom: 1px solid var(--accent-dark);
+		background-color: #fff;
+		transition: border 0.15s ease-out;
+		overflow: hidden;
+	}
+	.changeFile-button:hover {
+		border: 1px solid var(--accent-dark);
 	}
 
-	.changeFile-icon-wrapper {
-		color: var(--accent-dark);
+	.changeFile-icon {
+		position: relative;
+		color: #fff;
+		background-color: var(--accent);
+		height: 100%;
+		padding-inline: 6px;
+		display: flex;
+		align-items: center;
+		transition: background 0.25s ease-out;
+	}
+
+	#change-icon.hide {
+		visibility: hidden;
+	}
+	#benchy-loader-form.hide {
+		visibility: hidden;
+	}
+
+	.changeFile-button:hover > .changeFile-icon {
+		background-color: var(--accent-dark);
 	}
 	.printCard-form-field label {
 		color: var(--muted);
@@ -480,6 +568,13 @@ import { ImagePlus } from "@lucide/astro";
 	.printCard-container.hide {
 		display: none;
 	}
+
+	.benchy-loader-form {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
 </style>
 
 <script>
@@ -511,8 +606,16 @@ import { ImagePlus } from "@lucide/astro";
 		".printCard-thumbnail",
 	);
 	const form = document.querySelector<HTMLFormElement>("#print-card-form");
+	const fileNameTextButton = document.querySelector<HTMLSpanElement>(
+		"#fileName-text-button",
+	);
+	const inputFile = document.querySelector<HTMLInputElement>("#gcode-file");
+	const changeFileButton =
+		document.querySelector<HTMLSpanElement>("#changeFile-button");
 	const cropSelect =
 		document.querySelector<HTMLSelectElement>("#crop-select");
+	const benchyLoader = document.querySelector("#benchy-loader-form");
+	const changeIcon = document.querySelector("#change-icon");
 	form?.addEventListener("submit", async (e) => {
 		e.preventDefault();
 
@@ -573,6 +676,7 @@ import { ImagePlus } from "@lucide/astro";
 		const { printCardMetadata } = printCardState;
 
 		if (!printCardMetadata) return;
+
 		fillPrintCardForm(formatMetadata(printCardMetadata));
 	});
 
@@ -583,6 +687,21 @@ import { ImagePlus } from "@lucide/astro";
 	const borderInput = document.getElementById(
 		"border-input",
 	) as HTMLInputElement;
+
+	changeFileButton?.addEventListener("click", () => {
+		if (!inputFile) return;
+		inputFile.value = "";
+		inputFile.click();
+	});
+	window.addEventListener("print-card-preview-ready", () => {
+		if (benchyLoader && changeIcon) {
+			changeIcon.classList.remove("hide");
+			benchyLoader.classList.add("hide");
+		}
+		if (!fileNameTextButton || !inputFile?.files?.[0]) return;
+
+		fileNameTextButton.innerText = inputFile.files[0].name;
+	});
 
 	shadowInput.addEventListener("change", () => {
 		if (shadowInput.checked) {

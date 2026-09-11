@@ -23,3 +23,8 @@ export function setupPrintCardForm(form: HTMLFormElement) {
 
     form.addEventListener("input", updateFormData);
 }
+
+export function resetPrintCardForm(form: HTMLFormElement) {
+    form.reset();
+    form.dispatchEvent(new Event("input", { bubbles: true }));
+}

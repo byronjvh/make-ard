@@ -80,9 +80,11 @@ import BenchyLoader from "./BenchyLoader.astro";
 
     import { extractPrintCardMetadata } from "../logic/extractPrintCardMetadata";
     import {
+        clearPrintCardMetadata,
         setPrintCardMetadata,
         setPrintCardPreview,
     } from "../logic/printCardState";
+    import { resetPrintCardForm } from "../logic/setupPrintCardForm";
     // =========================================================
     // ELEMENTOS
     // =========================================================
@@ -106,6 +108,10 @@ import BenchyLoader from "./BenchyLoader.astro";
         document.querySelector<HTMLSelectElement>("#crop-select");
     const arrowIcon = document.querySelector<HTMLElement>(".arrow-icon");
     const benchyLoader = document.querySelector<HTMLElement>(".benchy-loader");
+    const form = document.querySelector<HTMLFormElement>("#print-card-form");
+
+    const benchyLoaderForm = document.querySelector("#benchy-loader-form");
+    const changeIcon = document.querySelector("#change-icon");
 
     const setLoading = (loading: boolean) => {
         arrowIcon?.classList.toggle("hide", loading);
@@ -122,7 +128,8 @@ import BenchyLoader from "./BenchyLoader.astro";
         !viewSelect ||
         !zoomSelect ||
         !themeSelect ||
-        !cropSelect
+        !cropSelect ||
+        !form
     ) {
         throw new Error("No se encontraron los elementos necesarios");
     }
@@ -206,7 +213,10 @@ import BenchyLoader from "./BenchyLoader.astro";
                 window.dispatchEvent(
                     new CustomEvent("print-card-metadata-ready"),
                 );
+
                 cropSelect.classList.add("hide");
+                viewSelect.classList.remove("hide");
+                zoomSelect.classList.remove("hide");
 
                 uploadWrapper.classList.add("hide");
                 printCardContainer.classList.remove("hide");
@@ -225,7 +235,9 @@ import BenchyLoader from "./BenchyLoader.astro";
 
             const image = URL.createObjectURL(file);
 
+            clearPrintCardMetadata();
             setPrintCardPreview(image);
+            resetPrintCardForm(form);
 
             window.dispatchEvent(new CustomEvent("print-card-preview-ready"));
 
@@ -279,6 +291,8 @@ import BenchyLoader from "./BenchyLoader.astro";
 
     fileInput.addEventListener("change", async (event) => {
         const input = event.currentTarget as HTMLInputElement;
+        benchyLoaderForm?.classList.remove("hide");
+        changeIcon?.classList.add("hide");
 
         setLoading(true);
 
@@ -303,7 +317,9 @@ import BenchyLoader from "./BenchyLoader.astro";
         ) {
             const image = URL.createObjectURL(file);
 
+            clearPrintCardMetadata();
             setPrintCardPreview(image);
+            resetPrintCardForm(form);
 
             window.dispatchEvent(new CustomEvent("print-card-preview-ready"));
 
@@ -334,6 +350,9 @@ import BenchyLoader from "./BenchyLoader.astro";
             window.dispatchEvent(new CustomEvent("print-card-metadata-ready"));
 
             cropSelect.classList.add("hide");
+            viewSelect.classList.remove("hide");
+            zoomSelect.classList.remove("hide");
+
             uploadWrapper.classList.add("hide");
             printCardContainer.classList.remove("hide");
             setLoading(false);

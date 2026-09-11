@@ -28,3 +28,7 @@ export function setPrintCardMetadata(
 ) {
     printCardState.printCardMetadata = metadata;
 }
+
+export function clearPrintCardMetadata() {
+    printCardState.printCardMetadata = undefined;
+}
