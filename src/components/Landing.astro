@@ -2,8 +2,10 @@
 import BenchyLoader from "./BenchyLoader.astro";
 import GCodeViewer from "./GCodeViewer.astro";
 import PrintCard from "./PrintCard.astro";
+import ES from "./icons/ES.astro";
+import GB from "./icons/GB.astro";
 import GitHub from "./icons/GitHub.astro";
-import { FileImage, RefreshCw } from "@lucide/astro";
+import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 ---
 
 <div id="container">
@@ -12,6 +14,15 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 			<p class="logo">Make-ard</p>
 		</a>
 		<nav>
+			<div class="language-picker">
+				<button id="language-button" class="language-selected"
+					><GB size="22" /> <ChevronDown size={22} /></button
+				>
+				<div id="language-menu" class="language-menu">
+					<button>English <GB size="20" /></button>
+					<button>Español <ES size="20" /></button>
+				</div>
+			</div>
 			<a class="nav-link disabled" href="#">Suite</a>
 			<div class="nav-link-container">
 				<GitHub size="18" />
@@ -266,6 +277,71 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 		width: 100%;
 		padding: 16px 32px;
 		max-width: 1000px;
+	}
+
+	.language-picker {
+		position: relative;
+		min-height: 0;
+		height: min-content;
+	}
+	.language-picker button {
+		font-family: "Google sans";
+		font-size: 14px;
+	}
+	.language-selected {
+		display: flex;
+		border: none;
+		background-color: var(--bg-elevated);
+		padding: 4px 4px 4px 8px;
+		border-radius: 8px;
+		border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+		align-items: center;
+		gap: 4px;
+		font-family: "Google sans";
+		font-weight: 700;
+		font-size: 16px;
+		transition: background 0.15s ease-out;
+		cursor: pointer;
+	}
+	.language-selected:hover {
+		background-color: var(--accent-soft);
+	}
+	.language-menu {
+		position: absolute;
+		display: flex;
+		flex-direction: column;
+		background-color: var(--bg-elevated);
+		border-radius: 8px;
+		padding: 4px;
+		gap: 2px;
+		right: 0;
+		top: calc(100% + 2px);
+		overflow: hidden;
+		height: 0px;
+		transform: scaleY(0);
+		transform-origin: top;
+		interpolate-size: allow-keywords;
+		transition:
+			height 0.15s ease-out,
+			transform 0.15s ease-out;
+	}
+	.language-menu button {
+		background-color: transparent;
+		padding: 2px 4px;
+		border-radius: 4px;
+		cursor: pointer;
+		display: flex;
+		gap: 4px;
+		justify-content: space-between;
+		border: none;
+	}
+	.language-menu button:hover {
+		background-color: var(--accent-soft);
+	}
+
+	.language-menu.open {
+		height: auto;
+		transform: scaleY(1);
 	}
 
 	nav {
@@ -600,6 +676,15 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 		type FormattedPrintCardMetadata,
 	} from "../logic/formatMetadata";
 	import html2canvas from "html2canvas";
+
+	const langButton = document.querySelector("#language-button");
+	const langMenu = document.querySelector("#language-menu");
+	let langOpen = false;
+	langButton?.addEventListener("click", () => {
+		langOpen = !langOpen;
+		langMenu?.classList.toggle("open", langOpen);
+	});
+
 	let hasShadow = true;
 	const printCard = document.querySelector<HTMLElement>(".printCard");
 	const printCardImg = document.querySelector<HTMLImageElement>(
