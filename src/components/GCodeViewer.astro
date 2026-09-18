@@ -30,12 +30,16 @@ import BenchyLoader from "./BenchyLoader.astro";
                     />
                     <BenchyLoader size="36" class="benchy-loader hide" />
                 </span>
-                <p class="gcode-text">Suelta tu G-code o imagen aquí</p>
-                <p class="gcode-file-name" id="file-name">
+                <p data-i18n="drop" class="gcode-text">
+                    Suelta tu G-code o imagen aquí
+                </p>
+                <p data-i18n="dropFile" class="gcode-file-name" id="file-name">
                     Ningún archivo seleccionado
                 </p>
                 <span class="gcode-line-separator"></span>
-                <p class="drop-hint">o haz clic para buscar en tu equipo</p>
+                <p data-i18n="dropLocal" class="drop-hint">
+                    o haz clic para buscar en tu equipo
+                </p>
             </label>
         </div>
         <div class="decoration-metadata">
@@ -43,17 +47,19 @@ import BenchyLoader from "./BenchyLoader.astro";
                 <RulerDimensionLine
                     size={20}
                     class="decoration-metadata-icon"
-                />Dimensiones
+                />
+                <span data-i18n="dimensions"> Dimensiones </span>
             </p>
-            <p><Box size={20} class="decoration-metadata-icon" />Material</p>
             <p>
-                <LayersArrowDown
-                    size={20}
-                    class="decoration-metadata-icon"
-                />Altura de capa
+                <Box size={20} class="decoration-metadata-icon" />
+                <span data-i18n="material"> Material </span>
+            </p>
+            <p>
+                <LayersArrowDown size={20} class="decoration-metadata-icon" />
+                <span data-i18n="layerHeight"> Altura de capa </span>
             </p>
         </div>
-        <p class="upload-text">
+        <p data-i18n="disclaimer" class="upload-text">
             Cargar tu G-code, en casos compatibles, permite generar una vista
             previa de tu modelo y extraer metadatos de impresión. También puedes
             comenzar con una imagen.
@@ -642,5 +648,15 @@ import BenchyLoader from "./BenchyLoader.astro";
         z-index: -9999;
         left: 0;
         top: 0;
+    }
+
+    @media screen and (max-width: 580px) {
+        .decoration-metadata {
+            padding: 0;
+        }
+
+        .gcode-text {
+            font-size: 16px;
+        }
     }
 </style>

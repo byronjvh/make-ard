@@ -1,72 +1,53 @@
 ---
 import BenchyLoader from "./BenchyLoader.astro";
 import GCodeViewer from "./GCodeViewer.astro";
+import Header from "./Header.astro";
 import PrintCard from "./PrintCard.astro";
-import ES from "./icons/ES.astro";
-import GB from "./icons/GB.astro";
-import GitHub from "./icons/GitHub.astro";
-import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
+import { FileImage, RefreshCw } from "@lucide/astro";
 ---
 
 <div id="container">
-	<header>
-		<a href="/" class="logo-link">
-			<p class="logo">Make-ard</p>
-		</a>
-		<nav>
-			<div class="language-picker">
-				<button id="language-button" class="language-selected"
-					><GB size="22" /> <ChevronDown size={22} /></button
-				>
-				<div id="language-menu" class="language-menu">
-					<button>English <GB size="20" /></button>
-					<button>Español <ES size="20" /></button>
-				</div>
-			</div>
-			<a class="nav-link disabled" href="#">Suite</a>
-			<div class="nav-link-container">
-				<GitHub size="18" />
-				<a class="nav-link" href="#">Repositorio</a> ·
-				<a class="nav-link" href="#">byronjvh</a>
-			</div>
-		</nav>
-	</header>
+	<Header />
 	<span class="landing-top-separator"></span>
-	<h1 class="landing-title">
+	<h1 data-i18n="title" class="landing-title">
 		Tu impresora hace la pieza, make-ard hace la ficha
 	</h1>
-	<p class="landing-tagline">
+	<p data-i18n="description" class="landing-tagline">
 		Genera cards con los datos de tu modelo en segundos, elige un theme y
 		compártelas donde quieras
 	</p>
 	<GCodeViewer />
 	<section class="printCard-container hide">
 		<div>
-			<div class="printCard-area">
+			<div id="printCard-area" class="printCard-area">
 				<PrintCard />
 			</div>
 			<div id="controls" class="controls">
 				<div class="selec-wrapper">
-					<label for="view-select">Vista</label>
+					<label data-i18n="view" for="view-select">Vista</label>
 					<select name="view" id="view-select"> </select>
 				</div>
 				<div class="selec-wrapper">
-					<label for="zoom-select">Zoom</label>
+					<label data-i18n="zoom" for="zoom-select">Zoom</label>
 					<select name="zoom" id="zoom-select"> </select>
 				</div>
 				<div class="selec-wrapper">
-					<label for="crop-select">Crop</label>
+					<label data-i18n="crop" for="crop-select">Crop</label>
 					<select name="theme" id="crop-select">
-						<option value="cover">Cover</option>
-						<option value="contain">Preserve</option>
+						<option data-i18n="crops.cover" value="cover"
+							>Cover</option
+						>
+						<option data-i18n="crops.contain" value="contain"
+							>Preserve</option
+						>
 					</select>
 				</div>
 				<div class="selec-wrapper">
-					<label for="theme-select">Tema</label>
+					<label data-i18n="theme" for="theme-select">Tema</label>
 					<select name="theme" id="theme-select"> </select>
 				</div>
 				<div class="selec-wrapper checkbox">
-					<label for="shadow-input">Shadow</label>
+					<label data-i18n="shadow" for="shadow-input">Shadow</label>
 					<input
 						type="checkbox"
 						checked
@@ -75,7 +56,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 					/>
 				</div>
 				<div class="selec-wrapper checkbox">
-					<label for="border-input">Border</label>
+					<label data-i18n="border" for="border-input">Border</label>
 					<input type="checkbox" name="border" id="border-input" />
 				</div>
 			</div>
@@ -84,11 +65,13 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 			<span class="corner tl"></span>
 			<span class="corner br"></span>
 
-			<h3>DATOS DEL MODELO</h3>
+			<h3 data-i18n="formTitle">DATOS DEL MODELO</h3>
 
 			<div class="printCard-form-row">
 				<div class="printCard-form-field title">
-					<label for="modelName">Nombre del modelo</label>
+					<label data-i18n="formName" for="modelName"
+						>Nombre del modelo</label
+					>
 					<input
 						id="modelName"
 						name="modelName"
@@ -98,7 +81,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 					/>
 				</div>
 				<div class="printCard-form-field changeFile">
-					<label for="changeFile-button">Archivo</label>
+					<label data-i18n="formFile" for="changeFile-button"
+						>Archivo</label
+					>
 					<button
 						type="button"
 						id="changeFile-button"
@@ -123,8 +108,11 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 			</div>
 
 			<div class="printCard-form-field">
-				<label for="description">Descripción del modelo</label>
+				<label data-i18n="formDescription" for="description"
+					>Descripción del modelo</label
+				>
 				<input
+					data-i18n="formDescriptionPlaceholder"
 					id="description"
 					name="description"
 					type="text"
@@ -135,7 +123,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="printTime">Print Time</label>
+					<label data-i18n="formTime" for="printTime"
+						>Print Time</label
+					>
 					<input
 						id="printTime"
 						name="printTime"
@@ -146,7 +136,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="filamentUsed">Filament Used</label>
+					<label data-i18n="formFilament" for="filamentUsed"
+						>Filament Used</label
+					>
 					<input
 						id="filamentUsed"
 						name="filamentUsed"
@@ -157,7 +149,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="dimensions">Dimensions</label>
+					<label data-i18n="dimensions" for="dimensions"
+						>Dimensions</label
+					>
 					<input
 						id="dimensions"
 						name="dimensions"
@@ -170,7 +164,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="layerHeight">Layer Height</label>
+					<label data-i18n="layerHeight" for="layerHeight"
+						>Layer Height</label
+					>
 					<input
 						id="layerHeight"
 						name="layerHeight"
@@ -181,7 +177,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="infill">Infill</label>
+					<label data-i18n="formInfill" for="infill">Infill</label>
 					<input
 						id="infill"
 						name="infill"
@@ -192,7 +188,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="walls">Walls</label>
+					<label data-i18n="formWalls" for="walls">Walls</label>
 					<input
 						id="walls"
 						name="walls"
@@ -205,7 +201,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="material">Material</label>
+					<label data-i18n="material" for="material">Material</label>
 					<input
 						id="material"
 						name="material"
@@ -216,7 +212,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="nozzleDiameter">Nozzle</label>
+					<label data-i18n="formNozzle" for="nozzleDiameter"
+						>Nozzle</label
+					>
 					<input
 						id="nozzleDiameter"
 						name="nozzleDiameter"
@@ -227,7 +225,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="supports">Supports</label>
+					<label data-i18n="formSupports" for="supports"
+						>Supports</label
+					>
 					<input
 						id="supports"
 						name="supports"
@@ -240,7 +240,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 
 			<div class="printCard-form-row">
 				<div class="printCard-form-field">
-					<label for="printer">Printer</label>
+					<label data-i18n="formPrinter" for="printer">Printer</label>
 					<input
 						id="printer"
 						name="printer"
@@ -251,7 +251,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 
 				<div class="printCard-form-field">
-					<label for="signature">Signature</label>
+					<label data-i18n="formPrinter" for="signature"
+						>Signature</label
+					>
 					<input
 						id="signature"
 						name="signature"
@@ -262,134 +264,17 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 			</div>
 
-			<button class="printCard-form-download" type="submit"
-				>Descargar Print Card</button
+			<button
+				data-i18n="formDownload"
+				class="printCard-form-download"
+				type="submit">Descargar Print Card</button
 			>
 		</form>
 	</section>
 </div>
 
 <style>
-	header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-		padding: 16px 32px;
-		max-width: 1000px;
-	}
-
-	.language-picker {
-		position: relative;
-		min-height: 0;
-		height: min-content;
-	}
-	.language-picker button {
-		font-family: "Google sans";
-		font-size: 14px;
-	}
-	.language-selected {
-		display: flex;
-		border: none;
-		background-color: var(--bg-elevated);
-		padding: 4px 4px 4px 8px;
-		border-radius: 8px;
-		border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
-		align-items: center;
-		gap: 4px;
-		font-family: "Google sans";
-		font-weight: 700;
-		font-size: 16px;
-		transition: background 0.15s ease-out;
-		cursor: pointer;
-	}
-	.language-selected:hover {
-		background-color: var(--accent-soft);
-	}
-	.language-menu {
-		position: absolute;
-		display: flex;
-		flex-direction: column;
-		background-color: var(--bg-elevated);
-		border-radius: 8px;
-		padding: 4px;
-		gap: 2px;
-		right: 0;
-		top: calc(100% + 2px);
-		overflow: hidden;
-		height: 0px;
-		transform: scaleY(0);
-		transform-origin: top;
-		interpolate-size: allow-keywords;
-		transition:
-			height 0.15s ease-out,
-			transform 0.15s ease-out;
-	}
-	.language-menu button {
-		background-color: transparent;
-		padding: 2px 4px;
-		border-radius: 4px;
-		cursor: pointer;
-		display: flex;
-		gap: 4px;
-		justify-content: space-between;
-		border: none;
-	}
-	.language-menu button:hover {
-		background-color: var(--accent-soft);
-	}
-
-	.language-menu.open {
-		height: auto;
-		transform: scaleY(1);
-	}
-
-	nav {
-		display: flex;
-		gap: 22px;
-		align-items: center;
-		font-family: "Google Sans", sans-serif;
-	}
-
-	.nav-link {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-weight: 500;
-		font-size: 16px;
-		color: var(--ink);
-		text-decoration: none;
-		transition: color 0.15s ease-out;
-	}
-	.nav-link.disabled {
-		color: var(--placeholder);
-		cursor: pointer;
-		pointer-events: none;
-	}
-	.nav-link:hover {
-		color: var(--accent-dark);
-	}
-	.nav-link-container {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-	}
-
-	.logo-link {
-		text-decoration: none;
-		color: var(--ink);
-	}
-
-	.logo {
-		font-family: "Ubuntu sans", sans-serif;
-		font-weight: bold;
-		font-style: italic;
-		font-size: 24px;
-		letter-spacing: -1px;
-	}
-
 	#container {
-		width: 100svw;
 		max-width: 100svw;
 		display: flex;
 		align-items: center;
@@ -408,6 +293,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 		max-width: 1000px;
 		display: flex;
 		gap: 16px;
+		padding-bottom: 120px;
 	}
 
 	.landing-title {
@@ -491,6 +377,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 	}
 
 	.printCard-area {
+		box-sizing: border-box;
 		background-color: var(--bg-elevated);
 		border-radius: 6px;
 		width: calc(
@@ -538,6 +425,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 		flex-direction: column;
 		gap: 4px;
 		font-size: "Google sans", sans-serif;
+		flex: 1;
 	}
 	.changeFile-text {
 		padding-inline: 4px;
@@ -560,6 +448,7 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 		height: 100%;
 		width: 100%;
 		display: flex;
+		justify-content: space-between;
 		align-items: center;
 		cursor: pointer;
 		background-color: #fff;
@@ -594,6 +483,9 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 	.printCard-form-field label {
 		color: var(--muted);
 		font-size: 14px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 	.printCard-form-field.title {
 		flex: 1;
@@ -651,6 +543,46 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 		top: 50%;
 		transform: translate(-50%, -50%);
 	}
+
+	@media screen and (max-width: 580px) {
+		.landing-title {
+			font-size: 32px;
+		}
+
+		.landing-tagline {
+			font-size: 16px;
+		}
+
+		.printCard-form-field label {
+			font-size: 12px;
+		}
+		.printCard-form-field input {
+			font-size: 12px;
+		}
+
+		.selec-wrapper label {
+			font-size: 12px;
+		}
+
+		.selec-wrapper select {
+			font-size: 12px;
+		}
+	}
+
+	@media screen and (max-width: 980px) {
+		.printCard-container {
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.printCard-form {
+			max-width: 480px;
+		}
+		.controls {
+			max-width: 480px;
+			justify-self: center;
+		}
+	}
 </style>
 
 <script>
@@ -676,14 +608,11 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 		type FormattedPrintCardMetadata,
 	} from "../logic/formatMetadata";
 	import html2canvas from "html2canvas";
-
-	const langButton = document.querySelector("#language-button");
-	const langMenu = document.querySelector("#language-menu");
-	let langOpen = false;
-	langButton?.addEventListener("click", () => {
-		langOpen = !langOpen;
-		langMenu?.classList.toggle("open", langOpen);
-	});
+	import {
+		translations,
+		getInitialLanguage,
+		type Language,
+	} from "../i18n/translations";
 
 	let hasShadow = true;
 	const printCard = document.querySelector<HTMLElement>(".printCard");
@@ -729,17 +658,33 @@ import { ChevronDown, FileImage, RefreshCw } from "@lucide/astro";
 
 		link.click();
 	});
+	const language = getInitialLanguage();
+	const texts = translations[language];
+	const descriptionPlaceholder =
+		document.querySelector<HTMLInputElement>("#description");
+
 	for (const zoom of zoomOptions) {
 		const option = document.createElement("option");
+
 		option.value = zoom;
-		option.textContent = zoom;
-		document?.getElementById("zoom-select")?.appendChild(option);
+		option.dataset.i18nGroup = "zooms";
+		option.dataset.i18nKey = zoom;
+
+		option.textContent = texts.zooms[zoom as keyof typeof texts.zooms];
+
+		document.getElementById("zoom-select")?.appendChild(option);
 	}
+
 	for (const angle of cameraAnglesOptions) {
 		const option = document.createElement("option");
+
 		option.value = angle;
-		option.textContent = dictionaryAngles[angle] || angle;
-		document?.getElementById("view-select")?.appendChild(option);
+		option.dataset.i18nGroup = "views";
+		option.dataset.i18nKey = angle;
+
+		option.textContent = texts.views[angle as keyof typeof texts.views];
+
+		document.getElementById("view-select")?.appendChild(option);
 	}
 
 	for (const theme of THEMES) {

@@ -30,8 +30,8 @@ import {
         </div>
         <div class="printCard-header-text">
             <div>
-                <h3 id="print-card-title">Título de la card</h3>
-                <p id="print-card-description" class="printCard-description">
+                <h3 id="print-card-title" class="xl">Título de la card</h3>
+                <p id="print-card-description" class="printCard-description xl">
                     Descripción corta del modelo 3D
                 </p>
             </div>
@@ -45,7 +45,7 @@ import {
                         />
                     </span>
                     <h4>Print Time</h4>
-                    <p>2h 34m</p>
+                    <p class="printCard-data-p medium">2h 34m</p>
                 </div>
                 <!-- <span class="separator"></span> -->
                 <div data-field="filamentUsed">
@@ -58,7 +58,7 @@ import {
                     </span>
                     <h4>Filament Used</h4>
 
-                    <p>24.6 g</p>
+                    <p class="printCard-data-p medium">24.6 g</p>
                 </div>
                 <!-- <span class="separator"></span> -->
                 <div data-field="dimensions">
@@ -70,7 +70,7 @@ import {
                         />
                     </span>
                     <h4>Dimensions</h4>
-                    <p>999×999×999 mm</p>
+                    <p class="printCard-data-p wide">999×999×999 mm</p>
                 </div>
             </div>
         </div>
@@ -81,7 +81,7 @@ import {
             <LayersArrowDown class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="layerHeight">
                 <h4>Layer Height</h4>
-                <p>0.20 mm</p>
+                <p class="printCard-data-p wide">0.20 mm</p>
             </div>
         </li>
         <li class="printCard-list-item">
@@ -92,41 +92,43 @@ import {
             />
             <div data-field="infill">
                 <h4>Infill</h4>
-                <p>15% Gyroid</p>
+                <p class="printCard-data-p wide">15% Gyroid</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <BrickWall class="icon-data" stroke-width={1.5} size={26} />
             <div data-field="walls">
                 <h4>Walls</h4>
-                <p>3 walls</p>
+                <p class="printCard-data-p wide">3 walls</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Box class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="material">
                 <h4>Material</h4>
-                <p>PLA</p>
+                <p class="printCard-data-p wide">PLA</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Nozzle class="icon-data" size={22} stroke-width={1.5} />
             <div data-field="nozzleDiameter">
                 <h4>Nozzle</h4>
-                <p>0.4 mm</p>
+                <p class="printCard-data-p wide">0.4 mm</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Landmark class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="supports">
                 <h4>Supports</h4>
-                <p>No</p>
+                <p class="printCard-data-p wide">No</p>
             </div>
         </li>
     </ul>
     <footer class="printCard-footer">
-        <p id="print-card-printer" class="printCard-printer">Flashforge AD5X</p>
-        <p class="signature">
+        <p id="print-card-printer" class="printCard-printer large">
+            Flashforge AD5X
+        </p>
+        <p class="signature wider">
             Made by @
             <span id="print-card-signature">username</span>
         </p>
@@ -147,7 +149,7 @@ import {
         ".printCard-thumbnail",
     );
     const benchyLoader = document.querySelector("#printCard-loader");
-    const printCard = document.querySelector(".printCard");
+    const printCard = document.querySelector<HTMLElement>(".printCard");
     const printCardTitle =
         document.querySelector<HTMLParagraphElement>("#print-card-title");
     const printCardDescription = document.querySelector<HTMLParagraphElement>(
@@ -231,6 +233,84 @@ import {
 
         updatePrintCard(detail);
     });
+
+    const printCardArea =
+        document.querySelector<HTMLElement>("#printCard-area");
+
+    const root = document.documentElement;
+
+    const cardWidth = 562;
+
+    const maxScale = 0.9;
+
+    const maxPadding = 20;
+    const minPadding = 14;
+
+    const viewportMargin = 24; // 4px por cada lado
+
+    const updatePrintCardSize = () => {
+        if (!printCard || !printCardArea) return;
+
+        const viewportWidth = window.innerWidth;
+
+        let scale = maxScale;
+        let padding = maxPadding;
+
+        if (viewportWidth < 580) {
+            /*
+             * El ancho exterior disponible para el wrapper.
+             * Dejamos 4px libres a cada lado.
+             */
+            const wrapperWidth = viewportWidth - viewportMargin;
+
+            /*
+             * Padding entre 14px y 20px.
+             */
+            const progress = Math.max(
+                0,
+                Math.min(1, (viewportWidth - 320) / 260),
+            );
+
+            padding = minPadding + (maxPadding - minPadding) * progress;
+
+            /*
+             * El ancho que realmente puede ocupar
+             * la tarjeta.
+             */
+            const cardAvailableWidth = wrapperWidth - padding * 2;
+
+            /*
+             * Scale necesario para que la tarjeta
+             * quepa exactamente.
+             */
+            scale = cardAvailableWidth / cardWidth;
+
+            scale = Math.min(scale, maxScale);
+        }
+
+        /*
+         * Las variables son globales porque las
+         * utiliza tanto PrintCard como printCard-area.
+         */
+        root.style.setProperty("--card-scale", String(scale));
+
+        root.style.setProperty("--wrapper-padding", `${padding}px`);
+
+        /*
+         * Importante:
+         * el width se establece directamente como
+         * el ancho EXTERIOR del wrapper.
+         */
+        if (viewportWidth < 580) {
+            printCardArea.style.width = `${viewportWidth - viewportMargin}px`;
+        } else {
+            printCardArea.style.removeProperty("width");
+        }
+    };
+
+    updatePrintCardSize();
+
+    window.addEventListener("resize", updatePrintCardSize);
 </script>
 
 <style>
@@ -292,11 +372,15 @@ import {
         color: var(--title-color);
         font-family: var(--font-title);
         text-transform: capitalize;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .printCard-header-info {
         display: flex;
-        gap: 28px;
+        justify-content: space-between;
+        gap: 4px;
         height: 100%;
         font-size: 18px;
         font-weight: 600;
@@ -329,6 +413,9 @@ import {
         font-size: 14px;
         font-weight: 600;
         opacity: 0.5;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .printCard-thumbnail-wrapper {
@@ -400,6 +487,7 @@ import {
         margin-top: auto;
         display: flex;
         justify-content: space-between;
+        gap: 16px;
     }
 
     .icon-header {
@@ -412,11 +500,17 @@ import {
     .printCard-printer {
         font-weight: 600;
         color: var(--description-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .signature {
         font-size: 14px;
         color: var(--subtitle-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     /* 1. Blueprint */
@@ -530,5 +624,30 @@ import {
 
     .printCard.border {
         border: var(--border);
+    }
+
+    .printCard-data-p {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .wide {
+        max-width: 132px;
+    }
+
+    .medium {
+        max-width: 90px;
+    }
+
+    .wider {
+        max-width: 190px;
+    }
+
+    .large {
+        max-width: 280px;
+    }
+    .xl {
+        max-width: 340px;
     }
 </style>
