@@ -20,7 +20,7 @@ import {
                 id="print-card-thumbnail"
                 class="printCard-thumbnail"
                 src="https://media.printables.com/media/prints/203925/images/1875500_cd7c1d22-dfb1-4c56-8e28-71fd9454dc74/thumbs/inside/1280x960/jpg/7b62dfe39e94e61584a93da27d085074_display_large_20.webp"
-                alt=""
+                alt="model thumbnail"
             />
             <BenchyLoader
                 size="52"
@@ -30,9 +30,9 @@ import {
         </div>
         <div class="printCard-header-text">
             <div>
-                <h3 id="print-card-title" class="xl">Título de la card</h3>
+                <h3 id="print-card-title" class="xl">Model name</h3>
                 <p id="print-card-description" class="printCard-description xl">
-                    Descripción corta del modelo 3D
+                    Model description
                 </p>
             </div>
             <div class="printCard-header-info">
@@ -251,7 +251,9 @@ import {
     const updatePrintCardSize = () => {
         if (!printCard || !printCardArea) return;
 
-        const viewportWidth = window.innerWidth;
+        // Usa el viewport visual real en móviles/tablets.
+        // En desktop normalmente coincide con innerWidth.
+        const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
 
         let scale = maxScale;
         let padding = maxPadding;

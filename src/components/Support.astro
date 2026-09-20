@@ -1,0 +1,119 @@
+---
+import { Coffee } from "@lucide/astro";
+import GitHub from "./icons/GitHub.astro";
+---
+
+<section id="support" class="support">
+    <div class="support-icon">
+        <Coffee size={28} />
+    </div>
+    <h2 data-i18n="supportTitle" class="support-title">Support Make-ard</h2>
+    <p data-i18n="supportDescription" class="support-description">
+        Coffee or code, every contribution helps Make-ard grow a little further.
+    </p>
+    <div class="support-buttons">
+        <a
+            class="support-coffee"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://ko-fi.com/byronjvh"
+            ><Coffee size={22} />
+            <span data-i18n="supportCoffee"> Buy me a coffee </span>
+        </a>
+        <a
+            class="support-github"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://github.com/byronjvh/make-ard"
+            ><GitHub size={20} />
+            <span data-i18n="supportGithub"> Contribute on GitHub </span>
+        </a>
+    </div>
+</section>
+
+<style>
+    .support {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 64px 16px 0;
+        margin-block: 90px;
+        max-width: 1000px;
+        color: var(--ink);
+        border-top: 1px solid var(--border);
+    }
+
+    .support-icon {
+        height: 64px;
+        width: 64px;
+        background-color: var(--accent-soft);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--accent-dark);
+        margin-bottom: 32px;
+    }
+
+    .support-title {
+        font-family: "Ubuntu Sans";
+        text-align: center;
+        font-weight: 900;
+        font-size: 28px;
+        margin-bottom: 14px;
+    }
+
+    .support-description {
+        text-align: center;
+        font-family: "Google sans";
+        color: var(--muted);
+        font-size: 18px;
+        margin-bottom: 32px;
+    }
+
+    .support-buttons {
+        display: flex;
+        gap: 16px;
+    }
+
+    .support-buttons a {
+        font-family: "Google sans";
+        padding: 12px 16px;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        letter-spacing: 0.2px;
+    }
+
+    .support-coffee {
+        background-color: var(--accent);
+        color: #fff;
+        transition: background 0.15s ease-out;
+    }
+
+    .support-coffee:hover {
+        background-color: var(--accent-dark);
+    }
+
+    .support-github {
+        border: 2px solid var(--accent);
+        color: var(--ink);
+        transition: background 0.15s ease-out;
+    }
+
+    .support-github:hover {
+        background-color: var(--accent-soft);
+    }
+
+    @media screen and (max-width: 580px) {
+        .support-buttons {
+            flex-direction: column;
+        }
+    }
+</style>

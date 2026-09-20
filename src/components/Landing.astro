@@ -4,17 +4,21 @@ import GCodeViewer from "./GCodeViewer.astro";
 import Header from "./Header.astro";
 import PrintCard from "./PrintCard.astro";
 import { FileImage, RefreshCw } from "@lucide/astro";
+import Support from "./Support.astro";
+import Footer from "./Footer.astro";
 ---
 
 <div id="container">
 	<Header />
 	<span class="landing-top-separator"></span>
-	<h1 data-i18n="title" class="landing-title">
-		Tu impresora hace la pieza, make-ard hace la ficha
+	<h1 class="landing-title">
+		<span data-i18n="titleStart">Your printer makes the part;</span>
+		<span class="landing-title-brand"> make-ard </span>
+		<span data-i18n="titleEnd">makes the Print Card</span>
 	</h1>
 	<p data-i18n="description" class="landing-tagline">
-		Genera cards con los datos de tu modelo en segundos, elige un theme y
-		compártelas donde quieras
+		Create cards with your model's data in seconds, choose a theme, and
+		share them wherever you want
 	</p>
 	<GCodeViewer />
 	<section class="printCard-container hide">
@@ -24,7 +28,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 			</div>
 			<div id="controls" class="controls">
 				<div class="selec-wrapper">
-					<label data-i18n="view" for="view-select">Vista</label>
+					<label data-i18n="view" for="view-select">View</label>
 					<select name="view" id="view-select"> </select>
 				</div>
 				<div class="selec-wrapper">
@@ -43,7 +47,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 					</select>
 				</div>
 				<div class="selec-wrapper">
-					<label data-i18n="theme" for="theme-select">Tema</label>
+					<label data-i18n="theme" for="theme-select">Theme</label>
 					<select name="theme" id="theme-select"> </select>
 				</div>
 				<div class="selec-wrapper checkbox">
@@ -65,12 +69,12 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 			<span class="corner tl"></span>
 			<span class="corner br"></span>
 
-			<h3 data-i18n="formTitle">DATOS DEL MODELO</h3>
+			<h3 data-i18n="formTitle">MODEL DATA</h3>
 
 			<div class="printCard-form-row">
 				<div class="printCard-form-field title">
 					<label data-i18n="formName" for="modelName"
-						>Nombre del modelo</label
+						>Model name</label
 					>
 					<input
 						id="modelName"
@@ -82,7 +86,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 				</div>
 				<div class="printCard-form-field changeFile">
 					<label data-i18n="formFile" for="changeFile-button"
-						>Archivo</label
+						>File</label
 					>
 					<button
 						type="button"
@@ -92,7 +96,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 						<p class="changeFile-text">
 							<FileImage size={16} />
 							<span id="fileName-text-button">
-								nombre_del_archivo.svg
+								file_name.svg
 							</span>
 						</p>
 						<span class="changeFile-icon"
@@ -109,7 +113,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 
 			<div class="printCard-form-field">
 				<label data-i18n="formDescription" for="description"
-					>Descripción del modelo</label
+					>Model description</label
 				>
 				<input
 					data-i18n="formDescriptionPlaceholder"
@@ -267,10 +271,13 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 			<button
 				data-i18n="formDownload"
 				class="printCard-form-download"
-				type="submit">Descargar Print Card</button
+				type="submit">Download Print Card</button
 			>
 		</form>
 	</section>
+
+	<Support />
+	<Footer />
 </div>
 
 <style>
@@ -293,7 +300,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 		max-width: 1000px;
 		display: flex;
 		gap: 16px;
-		padding-bottom: 120px;
+		padding-bottom: 0;
 	}
 
 	.landing-title {
@@ -305,6 +312,9 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 		text-wrap: balance;
 		margin-block: 16px;
 		color: var(--ink);
+	}
+	.landing-title-brand {
+		text-wrap: nowrap;
 	}
 
 	.landing-tagline {
@@ -446,6 +456,7 @@ import { FileImage, RefreshCw } from "@lucide/astro";
 		border: 1px solid var(--accent);
 		font-size: 13px;
 		height: 100%;
+		max-height: 33px;
 		width: 100%;
 		display: flex;
 		justify-content: space-between;

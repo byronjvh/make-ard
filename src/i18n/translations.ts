@@ -22,7 +22,9 @@ export function getStoredLanguage(): Language {
 
 export const translations = {
     en: {
-        title: "Your printer makes the part; make-ard makes the Print Card",
+        siteTitle: "Make-ard - 3D Printing Model Cards",
+        titleStart: "Your printer makes the part;",
+        titleEnd: "makes the Print Card",
         description: "Create cards with your model's data in seconds, choose a theme, and share them wherever you want",
 
         drop: "Drop your G-code or image here",
@@ -30,7 +32,7 @@ export const translations = {
         dropLocal: "or click to search your computer",
         dimensions: "Dimensions",
         material: "Material",
-        layerHeight: "Layer Height",
+        layerHeight: "Layer height",
         disclaimer: "Uploading your G-code—where supported—allows you to generate a preview of your model and extract print metadata. You can also start with an image.",
         repository: "Repository",
         view: "View",
@@ -73,11 +75,18 @@ export const translations = {
         formSupports: "Supports",
         formPrinter: "Printer",
         formSignature: "Signature",
-        formDownload: "Download Print Card"
+        formDownload: "Download Print Card",
+        supportTitle: "Support Make-ard",
+        supportDescription: "Coffee or code, every contribution helps Make-ard grow a little further.",
+        supportCoffee: "Buy me a coffee",
+        supportGithub: "Contribute on GitHub",
+        footer: "Made with ☕ & code · © 2026 Make-ard",
     },
 
     es: {
-        title: "Tu impresora hace la pieza, make-ard hace la ficha",
+        siteTitle: "Make-ard - Tarjetas para modelos 3D",
+        titleStart: "Tu impresora hace la pieza,",
+        titleEnd: "hace la ficha",
         description: "Genera cards con los datos de tu modelo en segundos, elige un theme y compártelas donde quieras",
 
         drop: "Suelta tu G-code o imagen aquí",
@@ -128,8 +137,12 @@ export const translations = {
         formSupports: "Soportes",
         formPrinter: "Impresora",
         formSignature: "Firma",
-        formDownload: "Descargar Print Card"
-
+        formDownload: "Descargar Print Card",
+        supportTitle: "Apoya Make-ard",
+        supportDescription: "Con un café o con código, cada aporte ayuda a que el proyecto siga creciendo",
+        supportCoffee: "Invítame un café",
+        supportGithub: "Contribuye en GitHub",
+        footer: "Hecho con ☕ y código · © 2026 Make-ard",
     },
 };
 

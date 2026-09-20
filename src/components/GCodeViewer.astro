@@ -31,14 +31,14 @@ import BenchyLoader from "./BenchyLoader.astro";
                     <BenchyLoader size="36" class="benchy-loader hide" />
                 </span>
                 <p data-i18n="drop" class="gcode-text">
-                    Suelta tu G-code o imagen aquí
+                    Drop your G-code or image here
                 </p>
                 <p data-i18n="dropFile" class="gcode-file-name" id="file-name">
-                    Ningún archivo seleccionado
+                    No file selected
                 </p>
                 <span class="gcode-line-separator"></span>
                 <p data-i18n="dropLocal" class="drop-hint">
-                    o haz clic para buscar en tu equipo
+                    or click to search your computer
                 </p>
             </label>
         </div>
@@ -48,7 +48,7 @@ import BenchyLoader from "./BenchyLoader.astro";
                     size={20}
                     class="decoration-metadata-icon"
                 />
-                <span data-i18n="dimensions"> Dimensiones </span>
+                <span data-i18n="dimensions"> Dimensions </span>
             </p>
             <p>
                 <Box size={20} class="decoration-metadata-icon" />
@@ -56,13 +56,13 @@ import BenchyLoader from "./BenchyLoader.astro";
             </p>
             <p>
                 <LayersArrowDown size={20} class="decoration-metadata-icon" />
-                <span data-i18n="layerHeight"> Altura de capa </span>
+                <span data-i18n="layerHeight"> Layer height </span>
             </p>
         </div>
         <p data-i18n="disclaimer" class="upload-text">
-            Cargar tu G-code, en casos compatibles, permite generar una vista
-            previa de tu modelo y extraer metadatos de impresión. También puedes
-            comenzar con una imagen.
+            Uploading your G-code—where supported—allows you to generate a
+            preview of your model and extract print metadata. You can also start
+            with an image.
         </p>
     </div>
 
@@ -614,13 +614,14 @@ import BenchyLoader from "./BenchyLoader.astro";
     .decoration-metadata {
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: space-around;
         width: 100%;
         max-width: 500px;
-        padding-inline: 16px;
         font-size: 14px;
         color: var(--ink);
         margin-bottom: 8px;
+        flex-wrap: wrap;
+        gap: 4px;
     }
 
     .decoration-metadata p {
@@ -640,13 +641,13 @@ import BenchyLoader from "./BenchyLoader.astro";
     }
 
     #gcode-canvas {
-        width: 500px;
-        height: 500px;
+        width: 1000px;
+        height: 1000px;
         opacity: 0;
         position: absolute;
         pointer-events: none;
         z-index: -9999;
-        left: 0;
+        left: -1100px;
         top: 0;
     }
 

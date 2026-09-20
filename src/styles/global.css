@@ -28,6 +28,9 @@
     /* acento, ahora en dorado ámbar en vez de naranja */
     --accent: #c9891f;
     --accent-dark: #a06c15;
+    /* acento, 2  */
+    --accent2: #3f6275;
+    --accent2-dark: #304d5d;
     /* hover, active */
     --accent-soft: #f3dda3;
     /* fondos suaves, badges, íconos */

@@ -1,11 +1,5 @@
 ---
-import {
-    ChevronDown,
-    Menu,
-    CircleUserRound,
-    Boxes,
-    GitBranch,
-} from "@lucide/astro";
+import { ChevronDown, Menu, Boxes, GitBranch, X } from "@lucide/astro";
 import GitHub from "./icons/GitHub.astro";
 import GB from "./icons/GB.astro";
 import ES from "./icons/ES.astro";
@@ -39,8 +33,11 @@ import ES from "./icons/ES.astro";
             </div>
         </div>
         <div class="menu-container">
-            <button class="menu-button"><Menu size={18} /></button>
-            <div class="menu-dropdown">
+            <button id="menu-button" class="menu-button">
+                <Menu class="menu-button-icon menu-icon" size={19} />
+                <X class="menu-button-icon x-icon" size={22} />
+            </button>
+            <div id="menu-dropdown" class="menu-dropdown">
                 <a class="nav-link disabled" href="#">
                     <span class="nav-icon">
                         <Boxes size={23} />
@@ -57,7 +54,7 @@ import ES from "./icons/ES.astro";
                     <span class="nav-icon">
                         <GitBranch size={23} />
                     </span>
-                    <span data-i18n="repository">Repositorio</span>
+                    <span data-i18n="repository">Repository</span>
                 </a>
                 <a
                     class="nav-link"
@@ -100,7 +97,7 @@ import ES from "./icons/ES.astro";
         display: flex;
         border: none;
         background-color: var(--bg-elevated);
-        padding: 4px 4px 4px 8px;
+        padding: 5px 5px 5px 8px;
         border-radius: 8px;
         border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
         align-items: center;
@@ -178,15 +175,27 @@ import ES from "./icons/ES.astro";
     }
 
     .menu-button {
+        position: relative;
+        height: 34px;
+        width: 34px;
         border: none;
         background-color: var(--bg-elevated);
-        padding: 8px;
         border-radius: 8px;
         display: none;
         align-items: center;
         justify-content: center;
         color: var(--ink);
         cursor: pointer;
+    }
+
+    .menu-button-icon {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        transition:
+            opacity 0.15s ease-out,
+            transform 0.15s ease-out;
     }
 
     nav {
@@ -258,10 +267,35 @@ import ES from "./icons/ES.astro";
         nav {
             gap: 16px;
         }
+
+        .menu-dropdown {
+            transform: scale(0);
+            transform-origin: right top;
+            transition: transform 0.15s ease-out;
+        }
+
+        .menu-dropdown.open {
+            transform: scale(1);
+        }
+
+        .x-icon {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(0.5) rotate(0);
+        }
+
+        .menu-container:has(.menu-dropdown.open) .x-icon {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1) rotate(90deg);
+        }
+        .menu-container:has(.menu-dropdown.open) .menu-icon {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(2) rotate(90deg);
+        }
     }
 </style>
 
 <script>
+    import { EllipseCurve } from "three";
     import { translations, type Language } from "../i18n/translations";
 
     const langButton =
@@ -361,23 +395,41 @@ import ES from "./icons/ES.astro";
 
         const language = languageButton.dataset.language;
 
+        if (language === "es") {
+            document.documentElement.lang = "es";
+        }
+
+        if (language === "en") {
+            document.documentElement.lang = "en";
+        }
+
         if (language === "en" || language === "es") {
             setLanguage(language);
+        } else {
+            setLanguage("en");
+            document.documentElement.lang = "en";
         }
 
         closeLanguageMenu();
     });
 
-    document.addEventListener("click", (event) => {
-        const target = event.target as Node;
+    const navMenuButton =
+        document.querySelector<HTMLButtonElement>("#menu-button");
+    const navMenu = document.querySelector<HTMLButtonElement>("#menu-dropdown");
 
-        if (!langButton?.contains(target) && !langMenu?.contains(target)) {
-            closeLanguageMenu();
-        }
+    let navMenuOpen = false;
+
+    navMenuButton?.addEventListener("click", (event) => {
+        event.stopPropagation();
+
+        navMenuOpen = !navMenuOpen;
+
+        navMenu?.classList.toggle("open", navMenuOpen);
+        navMenuButton.setAttribute("aria-expanded", String(navMenuOpen));
     });
 
     const initialLanguage = getInitialLanguage();
-
+    document.documentElement.lang = "en";
     setLanguage(initialLanguage);
 
     function updateSelectTranslations(language: Language) {
@@ -404,4 +456,20 @@ import ES from "./icons/ES.astro";
                 }
             });
     }
+    const closeNavMenu = () => {
+        navMenuOpen = false;
+
+        navMenu?.classList.remove("open");
+        navMenuButton?.setAttribute("aria-expanded", "false");
+    };
+    document.addEventListener("click", (event) => {
+        const target = event.target as Node;
+
+        if (!langButton?.contains(target) && !langMenu?.contains(target)) {
+            closeLanguageMenu();
+        }
+        if (!navMenuButton?.contains(target) && !navMenu?.contains(target)) {
+            closeNavMenu();
+        }
+    });
 </script>
