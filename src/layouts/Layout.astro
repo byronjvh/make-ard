@@ -146,6 +146,7 @@ const site = "https://makeard.com";
 		justify-content: end;
 		align-items: center;
 		padding-bottom: 4px;
+		z-index: 99999;
 	}
 
 	.mobile-ad {
@@ -168,6 +169,7 @@ const site = "https://makeard.com";
 		display: flex;
 		justify-content: space-between;
 		padding-inline: 16px;
+		z-index: 99999;
 	}
 
 	.desktop-ad {
@@ -176,6 +178,23 @@ const site = "https://makeard.com";
 		position: sticky;
 		top: 60px;
 		margin-top: 150px;
+	}
+
+	.mobile-ad-layout {
+		pointer-events: none;
+	}
+
+	.mobile-ad,
+	.mobile-ad-tablet {
+		pointer-events: auto;
+	}
+
+	.desktop-ad-layout {
+		pointer-events: none;
+	}
+
+	.desktop-ad {
+		pointer-events: auto;
 	}
 
 	/* Móvil */
