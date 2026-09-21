@@ -59,6 +59,71 @@ const site = "https://makeard.com";
 	</head>
 	<body>
 		<slot />
+		<div class="desktop-ad-layout">
+			<div class="desktop-ad desktop-ad-left">
+				<script>
+					declare var atOptions: any;
+					atOptions = {
+						key: "d3dfeb3ed7f8f9a65078bfbb9c253c0b",
+						format: "iframe",
+						height: 600,
+						width: 160,
+						params: {},
+					};
+				</script>
+				<script
+					src="https://www.highrevenueformat.com/d3dfeb3ed7f8f9a65078bfbb9c253c0b/invoke.js"
+				></script>
+			</div>
+			<div class="desktop-ad desktop-ad-right">
+				<script>
+					declare var atOptions: any;
+					atOptions = {
+						key: "2c7eb7f3db0daa12e21e9889e0e480a7",
+						format: "iframe",
+						height: 600,
+						width: 160,
+						params: {},
+					};
+				</script>
+				<script
+					src="https://www.highrevenueformat.com/2c7eb7f3db0daa12e21e9889e0e480a7/invoke.js"
+				></script>
+			</div>
+		</div>
+		<div class="mobile-ad-layout">
+			<div id="mobile-ad" class="mobile-ad">
+				<script>
+					declare var atOptions: any;
+					atOptions = {
+						key: "874b7b5463f29d8fa0d0e5d811328846",
+						format: "iframe",
+						height: 50,
+						width: 320,
+						params: {},
+					};
+				</script>
+				<script
+					src="https://www.highrevenueformat.com/874b7b5463f29d8fa0d0e5d811328846/invoke.js"
+				></script>
+			</div>
+
+			<div class="mobile-ad-tablet">
+				<script>
+					declare var atOptions: any;
+					atOptions = {
+						key: "289fdc5c3c0005942f17504449b9991b",
+						format: "iframe",
+						height: 90,
+						width: 728,
+						params: {},
+					};
+				</script>
+				<script
+					src="https://www.highrevenueformat.com/289fdc5c3c0005942f17504449b9991b/invoke.js"
+				></script>
+			</div>
+		</div>
 	</body>
 </html>
 
@@ -68,5 +133,87 @@ const site = "https://makeard.com";
 		background-color: var(--bg);
 		max-width: 100svw;
 		overflow: hidden auto;
+		position: relative;
+	}
+	.mobile-ad-layout {
+		height: 100%;
+		width: 100%;
+		position: fixed;
+		left: 0;
+		top: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: end;
+		align-items: center;
+		padding-bottom: 4px;
+	}
+
+	.mobile-ad {
+		/* background-color: red; */
+		width: 320px;
+		height: 50px;
+	}
+	.mobile-ad-tablet {
+		width: 728px;
+		height: 90px;
+		display: none;
+	}
+
+	.desktop-ad-layout {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		justify-content: space-between;
+		padding-inline: 16px;
+	}
+
+	.desktop-ad {
+		width: 160px;
+		height: 600px;
+		position: sticky;
+		top: 60px;
+		margin-top: 150px;
+	}
+
+	/* Móvil */
+	@media screen and (max-width: 767px) {
+		.mobile-ad {
+			display: block;
+		}
+
+		.mobile-ad-tablet,
+		.desktop-ad {
+			display: none;
+		}
+	}
+
+	/* Tablet */
+	@media screen and (min-width: 768px) and (max-width: 1399px) {
+		.mobile-ad {
+			display: none;
+		}
+
+		.mobile-ad-tablet {
+			display: block;
+		}
+
+		.desktop-ad {
+			display: none;
+		}
+	}
+
+	/* Desktop */
+	@media screen and (min-width: 1400px) {
+		.mobile-ad,
+		.mobile-ad-tablet {
+			display: none;
+		}
+
+		.desktop-ad {
+			display: block;
+		}
 	}
 </style>
