@@ -646,10 +646,14 @@ import Footer from "./Footer.astro";
 		e.preventDefault();
 
 		if (!printCard) return;
+
 		await document.fonts.ready;
+
+		const exportScale = 3;
+
 		const canvas = await html2canvas(printCard, {
 			useCORS: true,
-			scale: 1,
+			scale: exportScale,
 			backgroundColor: null,
 		});
 
