@@ -305,6 +305,8 @@ import {
          */
         if (viewportWidth < 580) {
             printCardArea.style.width = `${viewportWidth - viewportMargin}px`;
+            printCardArea.style.maxWidth = `${viewportWidth - viewportMargin}px`;
+            printCardArea.style.overflow = "hidden";
         } else {
             printCardArea.style.removeProperty("width");
         }
