@@ -719,7 +719,7 @@ import Footer from "./Footer.astro";
 				printCard.classList.add(selectedTheme);
 				if (selectedTheme !== "theme-neon") {
 					printCardBg.classList.remove("hide");
-					printCardBg.src = `/public/assets/${selectedTheme.split("-")[1]}.png`;
+					printCardBg.src = `/assets/${selectedTheme.split("-")[1]}.png`;
 					console.log(selectedTheme.split("-")[1]);
 				} else {
 					printCardBg.classList.add("hide");
