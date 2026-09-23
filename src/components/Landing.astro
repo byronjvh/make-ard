@@ -628,6 +628,8 @@ import Footer from "./Footer.astro";
 
 	let hasShadow = true;
 	const printCard = document.querySelector<HTMLElement>(".printCard");
+	const printCardBg =
+		document.querySelector<HTMLImageElement>("#printCard-bg");
 	const printCardImg = document.querySelector<HTMLImageElement>(
 		".printCard-thumbnail",
 	);
@@ -712,9 +714,16 @@ import Footer from "./Footer.astro";
 			?.getElementById("theme-select")
 			?.addEventListener("change", (event) => {
 				const selectedTheme = (event.target as HTMLSelectElement).value;
-				if (!printCard) return;
+				if (!printCard || !printCardBg) return;
 				printCard.classList.remove(...THEMES);
 				printCard.classList.add(selectedTheme);
+				if (selectedTheme !== "theme-neon") {
+					printCardBg.classList.remove("hide");
+					printCardBg.src = `/assets/${selectedTheme.split("-")[1]}.png`;
+					console.log(selectedTheme.split("-")[1]);
+				} else {
+					printCardBg.classList.add("hide");
+				}
 			});
 	}
 

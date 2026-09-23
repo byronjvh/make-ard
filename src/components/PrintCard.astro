@@ -1,5 +1,6 @@
 ---
 import BenchyLoader from "./BenchyLoader.astro";
+import Infill from "./icons/Infill.astro";
 import Nozzle from "./icons/Nozzle.astro";
 import {
     Clock,
@@ -85,11 +86,7 @@ import {
             </div>
         </li>
         <li class="printCard-list-item">
-            <WavesHorizontal
-                class="icon-border icon-data"
-                size={22}
-                stroke-width={2}
-            />
+            <Infill class="icon-data" size="22" />
             <div data-field="infill">
                 <h4>Infill</h4>
                 <p class="printCard-data-p wide">15% Gyroid</p>
@@ -133,6 +130,12 @@ import {
             <span id="print-card-signature">username</span>
         </p>
     </footer>
+    <img
+        id="printCard-bg"
+        class="printCard-bg"
+        src="/public/assets/blueprint.png"
+        alt="background"
+    />
 </article>
 
 <script>
@@ -348,7 +351,9 @@ import {
         border-radius: 16px;
         gap: 20px;
         font-family: var(--font-default);
-        border: 2px solid transparent;
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
     }
 
     .printCard header {
@@ -599,6 +604,8 @@ import {
         --description-color: #9fb4c9;
         --data-color: #e8fbff;
         --subtitle-color: #718aa3;
+        --neon1: #62ffffaa;
+        --neon2: #ff80c4aa;
     }
 
     .printCard.theme-toy {
@@ -620,6 +627,55 @@ import {
 
         --data-color: #493b37;
         --subtitle-color: #b39b91;
+    }
+
+    .printCard > *:not(.printCard-bg) {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Fuerza a la imagen a quedarse en un nivel inferior */
+    .printCard-bg {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        pointer-events: none; /* Asegura que no bloquee los clics en los elementos */
+        object-fit: cover;
+    }
+
+    .printCard-bg.hide {
+        opacity: 0;
+    }
+
+    .theme-blueprint .printCard-bg {
+        mix-blend-mode: multiply;
+        opacity: 0.3;
+        transform: rotateZ(180deg);
+    }
+    .theme-carbono .printCard-bg {
+        mix-blend-mode: color-dodge;
+        opacity: 0.6;
+    }
+    .theme-matcha .printCard-bg {
+        mix-blend-mode: darken;
+        opacity: 0.1;
+    }
+    .theme-cobre .printCard-bg {
+        filter: contrast(2);
+        mix-blend-mode: hard-light;
+        opacity: 0.06;
+    }
+    .theme-toy .printCard-bg {
+        opacity: 0.2;
+    }
+    .theme-neon .icon-header {
+        filter: drop-shadow(0px 0px 8px var(--neon1));
+    }
+    .theme-neon .icon-data {
+        filter: drop-shadow(0px 0px 8px var(--neon2));
     }
 
     .printCard.shadow {
