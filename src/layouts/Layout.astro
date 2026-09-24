@@ -18,7 +18,9 @@ const site = "https://makeard.com";
 			rel="stylesheet"
 		/>
 		<meta name="generator" content={Astro.generator} />
-		<title data-i18n="siteTitle">Make-ard — 3D Printing Model Cards</title>
+		<title data-i18n="siteTitle">
+			Make-ard — Create & Share 3D Print Cards — 3D Print Card Generator
+		</title>
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="website" />
@@ -29,7 +31,12 @@ const site = "https://makeard.com";
 		/>
 		<meta
 			property="og:description"
-			content="Create beautiful, shareable cards for your 3D printing models."
+			content="Create and share beautiful cards for your 3D prints with your model and print settings."
+		/>
+
+		<meta
+			name="description"
+			content="Create beautiful, shareable cards for your 3D prints. Upload your G-code, add your print settings, choose a theme, and generate a 3D print card in seconds."
 		/>
 		<meta property="og:image" content={`${site}/og-image.png`} />
 
@@ -37,11 +44,11 @@ const site = "https://makeard.com";
 		<meta name="twitter:card" content="summary_large_image" />
 		<meta
 			name="twitter:title"
-			content="Make-ard — 3D Printing Model Cards"
+			content="Make-ard — Create 3D Print Cards — 3D Print Card Generator"
 		/>
 		<meta
 			name="twitter:description"
-			content="Create beautiful, shareable cards for your 3D printing models."
+			content="Create and share beautiful cards for your 3D prints."
 		/>
 		<meta name="twitter:image" content={`${site}/og-image.png`} />
 
@@ -51,9 +58,14 @@ const site = "https://makeard.com";
 				"@type": "WebApplication",
 				"name": "Make-ard",
 				"url": "https://makeard.com",
-				"description": "Create shareable cards for 3D printing models with model data, previews and customizable themes.",
+				"description": "A 3D print card generator for creating and sharing cards with 3D model and print information.",
 				"applicationCategory": "DesignApplication",
-				"operatingSystem": "Web"
+				"operatingSystem": "Web",
+				"offers": {
+					"@type": "Offer",
+					"price": "0",
+					"priceCurrency": "USD"
+				}
 			}
 		</script>
 	</head>
