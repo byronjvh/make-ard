@@ -81,6 +81,7 @@ export const translations = {
         supportCoffee: "Buy me a coffee",
         supportGithub: "Contribute on GitHub",
         footer: "Made with ☕ & code · © 2026 Make-ard",
+        author: "Made by @"
     },
 
     es: {
@@ -143,6 +144,7 @@ export const translations = {
         supportCoffee: "Invítame un café",
         supportGithub: "Contribuye en GitHub",
         footer: "Hecho con ☕ y código · © 2026 Make-ard",
+        author: "Hecho por @"
     },
 };
 

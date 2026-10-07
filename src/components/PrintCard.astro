@@ -31,8 +31,14 @@ import {
         </div>
         <div class="printCard-header-text">
             <div>
-                <h3 id="print-card-title" class="xl">Model name</h3>
-                <p id="print-card-description" class="printCard-description xl">
+                <h3 id="print-card-title" class="xl" data-i18n="formName">
+                    Model name
+                </h3>
+                <p
+                    data-i18n="formDescription"
+                    id="print-card-description"
+                    class="printCard-description xl"
+                >
                     Model description
                 </p>
             </div>
@@ -45,7 +51,7 @@ import {
                             stroke-width={1.5}
                         />
                     </span>
-                    <h4>Print Time</h4>
+                    <h4 data-i18n="formTime">Print Time</h4>
                     <p class="printCard-data-p medium">2h 34m</p>
                 </div>
                 <!-- <span class="separator"></span> -->
@@ -57,7 +63,7 @@ import {
                             stroke-width={1.5}
                         />
                     </span>
-                    <h4>Filament Used</h4>
+                    <h4 data-i18n="formFilament">Filament Used</h4>
 
                     <p class="printCard-data-p medium">24.6 g</p>
                 </div>
@@ -70,7 +76,7 @@ import {
                             stroke-width={1.5}
                         />
                     </span>
-                    <h4>Dimensions</h4>
+                    <h4 data-i18n="dimensions">Dimensions</h4>
                     <p class="printCard-data-p wide">999×999×999 mm</p>
                 </div>
             </div>
@@ -81,42 +87,42 @@ import {
         <li class="printCard-list-item">
             <LayersArrowDown class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="layerHeight">
-                <h4>Layer Height</h4>
+                <h4 data-i18n="layerHeight">Layer Height</h4>
                 <p class="printCard-data-p wide">0.20 mm</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Infill class="icon-data" size="22" />
             <div data-field="infill">
-                <h4>Infill</h4>
+                <h4 data-i18n="formInfill">Infill</h4>
                 <p class="printCard-data-p wide">15% Gyroid</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <BrickWall class="icon-data" stroke-width={1.5} size={26} />
             <div data-field="walls">
-                <h4>Walls</h4>
+                <h4 data-i18n="formWalls">Walls</h4>
                 <p class="printCard-data-p wide">3 walls</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Box class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="material">
-                <h4>Material</h4>
+                <h4 data-i18n="material">Material</h4>
                 <p class="printCard-data-p wide">PLA</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Nozzle class="icon-data" size={22} stroke-width={1.5} />
             <div data-field="nozzleDiameter">
-                <h4>Nozzle</h4>
+                <h4 data-i18n="formNozzle">Nozzle</h4>
                 <p class="printCard-data-p wide">0.4 mm</p>
             </div>
         </li>
         <li class="printCard-list-item">
             <Landmark class="icon-data" size={26} stroke-width={1.5} />
             <div data-field="supports">
-                <h4>Supports</h4>
+                <h4 data-i18n="formSupports">Supports</h4>
                 <p class="printCard-data-p wide">No</p>
             </div>
         </li>
@@ -126,7 +132,7 @@ import {
             Flashforge AD5X
         </p>
         <p class="signature wider">
-            Made by @
+            <span data-i18n="author"> Made by @ </span>
             <span id="print-card-signature">username</span>
         </p>
     </footer>
